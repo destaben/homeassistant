@@ -1,0 +1,92 @@
+title: Home
+views:
+  - path: default_view
+    title: Home
+    cards:
+      - type: entities
+        entities:
+          - entity: light.bulbs
+          - entity: binary_sensor.door_1_opening
+            name: Puerta
+            icon: mdi:door
+          - entity: binary_sensor.motion_1_motion
+            name: Movimiento
+        title: Pasillo
+      - type: entities
+        entities:
+          - entity: switch.smart_plug_1909121534757325186448e1e903790b_outlet
+            name: Calentador
+            secondary_info: none
+        title: Cocina
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: entities
+            entities:
+              - entity: switch.sonoff_1000792ffc
+              - entity: select.tapo_camera_3ca0_move_to_preset
+                name: Mover cámara
+            title: Despacho
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: camera.tapo_camera_3ca0_hd_stream
+            hold_action:
+              action: call-service
+              service: ''
+              target: {}
+            name: Cámara 2
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: entities
+            entities:
+              - entity: switch.smart_plug_1909122087239425186448e1e9039bc1_outlet
+                icon: ''
+                name: Luz
+              - entity: fan.mi_air_purifier_2h
+              - entity: vacuum.ijai_v19_7d9f_robot_cleaner
+                name: Aspirador
+              - entity: sensor.mi_air_purifier_2h_temperature
+                name: Temperatura
+              - entity: sensor.mi_air_purifier_2h_humidity
+                name: Humedad
+              - entity: sensor.mi_air_purifier_2h_pm2_5
+                name: PM2.5
+              - entity: binary_sensor.window_1_opening
+                name: Ventana
+                icon: mdi:window-closed-variant
+              - entity: select.tapo_camera_2f13_move_to_preset
+                name: Mover cámara
+            title: Salón
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: camera.tapo_camera_2f13_hd_stream
+            name: Cámara 1
+          - type: media-control
+            entity: media_player.salon
+      - type: entities
+        entities:
+          - entity: light.light_bathroom
+          - entity: binary_sensor.contact_sensor_door
+            name: Puerta
+        title: Baño
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: entities
+            entities:
+              - entity: light.yeelink_color3_6f42_light
+                name: Luz
+              - entity: switch.switch_p300
+              - entity: binary_sensor.window_2_opening
+                name: Ventana
+            title: Dormitorio
+          - type: media-control
+            entity: media_player.bedroom_tv_2

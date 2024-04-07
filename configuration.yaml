@@ -1,0 +1,17 @@
+default_config:
+
+lovelace:
+  mode: yaml
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.1.222
+    - 127.0.0.1
+    - ::1
+
+template:
+  - sensor:
+      - name: "Calendar Message"
+        state: "{{ state_attr('calendar.homeassistant', 'message') }}"
+automation: !include automations.yaml
