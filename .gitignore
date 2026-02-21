@@ -4,9 +4,9 @@ homeassistant/zigbee.db
 homeassistant/know_devices.yaml
 
 # Home Assistant configuration folders
-www/
-blueprints/
-custom_components/
+homeassistant/www/
+homeassistant/blueprints/
+homeassistant/custom_components/
 
 # Logs
 homeassistant/home-assistant.log*
