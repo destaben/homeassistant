@@ -1,0 +1,572 @@
+- alias: button1.short_press
+  trigger:
+  - platform: state
+    entity_id: sensor.button_1_action
+    to: single
+  condition: []
+  action:
+  - service: switch.toggle
+    target:
+      entity_id: switch.light
+  mode: single
+  id: 85d5859e1db641a1888261c7e50bc843
+- alias: button1.doble_press
+  trigger:
+  - platform: state
+    entity_id: sensor.button_1_action
+    to: double
+  condition: []
+  action:
+  - service: switch.toggle
+    target:
+      entity_id: switch.smart_plug_1909122087239425186448e1e9039bc1_outlet
+  mode: single
+  id: 3586619585804538b7c1508fc0269771
+- id: eeb7f48406454e96a0b3355b96222859
+  alias: button1.long_press
+  triggers:
+  - entity_id: sensor.button_1_action
+    to: hold
+    trigger: state
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: automation.alarm
+        state: 'off'
+      sequence:
+      - target:
+          entity_id: automation.alarm
+        action: automation.turn_on
+        data: {}
+      - data:
+          media_content_id: https://cdn.pixabay.com/download/audio/2025/07/09/audio_a9c21b6107.mp3?filename=dragon-studio-notification-ping-372479.mp3
+          media_content_type: audio/mpeg
+        action: media_player.play_media
+        target:
+          entity_id:
+          - media_player.dormitorio
+          - media_player.despacho
+    - conditions:
+      - condition: state
+        entity_id: automation.alarm
+        state: 'on'
+      sequence:
+      - target:
+          entity_id: automation.alarm
+        action: automation.turn_off
+        data:
+          stop_actions: true
+      - data:
+          media_content_id: https://cdn.pixabay.com/download/audio/2025/01/22/audio_29d0954d88.mp3?filename=freesoundeffects-notification-disable-291235.mp3
+          media_content_type: audio/mpeg
+        action: media_player.play_media
+        target:
+          entity_id:
+          - media_player.dormitorio
+          - media_player.despacho
+  mode: single
+- alias: door.opened
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.door_1_contact
+    to: 'on'
+  condition: []
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.light_7_mqtt
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.light_6_mqtt
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.light_5_mqtt
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.light_4_mqtt
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.light_3_mqtt
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.light_2_mqtt
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.light_1_mqtt
+  - service: select.select_option
+    target:
+      entity_id: select.tapo_camera_2f13_move_to_preset
+    data:
+      option: Entrada
+  mode: single
+  id: 6ae87c8d2a04420a929f997dd77b6c1e
+- alias: door.closed
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.door_1_contact
+    to: 'off'
+  condition: []
+  action:
+  - delay: 00:05:00
+  - service: switch.turn_off
+    target:
+      entity_id: switch.light
+  - service: select.select_option
+    target:
+      entity_id: select.tapo_camera_2f13_move_to_preset
+    data:
+      option: Salon
+  mode: single
+  id: f0e711f057db4b72850b3741be494c25
+- id: 322664906974422b8bf0ab904808cf82
+  alias: entry.motion
+  triggers:
+  - type: occupied
+    device_id: 1d4bc0fe8519bd43dc411537f497a367
+    entity_id: 8ca46d8a8b7c8babdad683921dd40942
+    domain: binary_sensor
+    trigger: device
+  conditions:
+  - condition: time
+    after: 07:45:00
+    before: '23:00:00'
+  - condition: or
+    conditions:
+    - condition: device
+      device_id: fb9ba01b5a9d368a2993be502db8e24f
+      domain: device_tracker
+      entity_id: 2c0f2745c4a6403948493efba58d06d1
+      type: is_home
+    - condition: device
+      device_id: ac2b0047cdc113b6d167fba74c5b2b94
+      domain: device_tracker
+      entity_id: c6db7b9442730833965e6c13561aa5d2
+      type: is_home
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: switch.light
+      state: 'on'
+  actions:
+  - target:
+      entity_id:
+      - switch.light_1_mqtt
+    action: switch.turn_on
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - target:
+      entity_id:
+      - switch.light_2_mqtt
+    action: switch.turn_on
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - target:
+      entity_id:
+      - switch.light_7_mqtt
+    action: switch.turn_on
+    data: {}
+  - delay: 00:01:30
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.door_1_contact
+      state: 'on'
+  - target:
+      entity_id: switch.light
+    action: switch.turn_off
+    data: {}
+  - target:
+      entity_id: select.tapo_camera_2f13_move_to_preset
+    data:
+      option: Entrada
+    action: select.select_option
+  mode: single
+- id: aef7534a6736403faaaf8eb85c0ae137
+  alias: home.cleaner
+  triggers:
+  - at: '10:30:00'
+    trigger: time
+  conditions: []
+  actions:
+  - data:
+      preset_mode: Auto
+    target:
+      entity_id: fan.zhimi_mc2_8977_air_purifier
+    action: fan.set_preset_mode
+  - device_id: 55827bd0d1fec5ae41e9876eb5b02f5a
+    domain: vacuum
+    entity_id: 9c95d53ac4514e594fdd4f1672892293
+    type: clean
+  mode: single
+- id: 85bfdda99f40478e8031debd5bf5d85d
+  alias: home.empty
+  triggers:
+  - entity_id: person.destaben
+    to: not_home
+    trigger: state
+  - entity_id: person.carolmontaes
+    to: not_home
+    trigger: state
+  conditions:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: person.destaben
+      state: not_home
+    - condition: state
+      entity_id: person.carolmontaes
+      state: not_home
+  actions:
+  - target:
+      entity_id: switch.light
+    action: switch.turn_off
+    data: {}
+  - entity_id:
+    - switch.smart_plug_1909122087239425186448e1e9039bc1_outlet
+    - switch.smart_plug_1909121534757325186448e1e903790b_outlet
+    action: switch.turn_off
+  - target:
+      entity_id: select.tapo_camera_2f13_move_to_preset
+    data:
+      option: Entrada
+    action: select.select_option
+  mode: single
+- id: c96a836d1b6943e8a9b70121873d40a1
+  alias: night_mode
+  triggers:
+  - at: '19:00:00'
+    trigger: time
+  conditions: []
+  actions:
+  - data:
+      preset_mode: Sleep
+    target:
+      entity_id: fan.zhimi_mc2_8977_air_purifier
+    action: fan.set_preset_mode
+  mode: single
+- id: 8851d4c5159c422fac2b92382e6dd235
+  alias: turn_on.heater
+  triggers:
+  - at: 07:30:00
+    trigger: time
+  conditions: []
+  actions:
+  - entity_id: switch.smart_plug_1909121534757325186448e1e903790b_outlet
+    action: switch.turn_on
+  mode: single
+- alias: turn_off.heater
+  trigger:
+  - platform: time
+    at: '23:00:00'
+  condition: []
+  action:
+  - service: switch.turn_off
+    entity_id: switch.smart_plug_1909121534757325186448e1e903790b_outlet
+  mode: single
+  id: a140086922314f48bbbe1aa5b2d1eb2b
+- alias: notify.low_battery
+  description: Envía una notificación si algún dispositivo Zigbee tiene menos del
+    5% de batería
+  trigger:
+  - platform: time
+    at: '10:00:00'
+  condition:
+  - condition: template
+    value_template: "{%- set low_battery_devices = [] -%} {%- for entity in states.sensor
+      if 'battery' in entity.entity_id -%}\n  {%- if entity.state.isdigit() and entity.state
+      | int < 5 -%}\n    {%- set low_battery_devices = low_battery_devices + [entity.attributes.friendly_name
+      | default(entity.entity_id)] -%}\n  {%- endif -%}\n{%- endfor -%} {{ low_battery_devices
+      | length > 0 }}\n"
+  action:
+  - service: notify.mobile_app_davids_iphone
+    data_template:
+      title: Batería baja
+      message: 'Los siguientes dispositivos tienen menos del 5% de batería: {{ low_battery_devices
+        | join('', '') }}
+
+        '
+  mode: single
+  id: c5d2eeccc80540cfad550173a4dbf029
+- id: 0f735305405f47889c1bf8f9b55c7a91
+  alias: alarm
+  triggers:
+  - type: opened
+    device_id: dbb0fc69f7123578d6a883a88650536a
+    entity_id: c192d0dbeceb56f85a4cb16ae4539662
+    domain: binary_sensor
+    trigger: device
+  conditions: []
+  actions:
+  - action: camera.snapshot
+    metadata: {}
+    data: {}
+    target:
+      device_id: 8e72263c49d90a31e36428bb6fbc4b52
+- alias: tag.ordenador.switch
+  mode: single
+  trigger:
+  - platform: tag
+    tag_id: afc3795c-0cdb-4a5b-ac3a-12119c5bfb76
+  condition: []
+  action:
+  - action: switch.toggle
+    target:
+      entity_id: switch.plug_1
+  id: 0e4dc94853ee44db8d30a0a2e8533068
+- alias: button2.short_press
+  trigger:
+  - platform: state
+    entity_id: sensor.button_2_action
+    to: single
+  condition: []
+  action:
+  - service: light.toggle
+    target:
+      entity_id: light.yeelink_color3_6f42_light
+  mode: single
+  id: 26d7f3df55a04a4ead7a82040395a6bb
+- alias: button2.double_press
+  trigger:
+  - platform: state
+    entity_id: sensor.button_2_action
+    to: double
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.light
+  - service: switch.turn_off
+    target:
+      entity_id:
+      - switch.smart_plug_1909122087239425186448e1e9039bc1_outlet
+      - switch.smart_plug_1909121534757325186448e1e903790b_outlet
+  mode: single
+  id: eeb7f48406454e96a0b3355b96222811
+- id: b1b3f8d4c2e5a6f7g9h0i1j2k3l4m5n6
+  alias: button2.long_press
+  triggers:
+  - entity_id: sensor.button_2_action
+    to: hold
+    trigger: state
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: automation.alarm
+        state: 'off'
+      sequence:
+      - target:
+          entity_id: automation.alarm
+        action: automation.turn_on
+        data: {}
+      - data:
+          media_content_id: https://cdn.pixabay.com/download/audio/2025/07/09/audio_a9c21b6107.mp3?filename=dragon-studio-notification-ping-372479.mp3
+          media_content_type: audio/mpeg
+        action: media_player.play_media
+        target:
+          entity_id:
+          - media_player.dormitorio
+          - media_player.despacho
+    - conditions:
+      - condition: state
+        entity_id: automation.alarm
+        state: 'on'
+      sequence:
+      - target:
+          entity_id: automation.alarm
+        action: automation.turn_off
+        data:
+          stop_actions: true
+      - data:
+          media_content_id: https://cdn.pixabay.com/download/audio/2025/01/22/audio_29d0954d88.mp3?filename=freesoundeffects-notification-disable-291235.mp3
+          media_content_type: audio/mpeg
+        action: media_player.play_media
+        target:
+          entity_id:
+          - media_player.dormitorio
+          - media_player.despacho
+  mode: single
+- id: e2e12d01517d49a19c36a7051ba61d71
+  alias: low_level_water
+  triggers:
+  - entity_id:
+    - sensor.xiaomi_robot_vacuum_x20_low_water_warning
+    to: Low
+    trigger: state
+  conditions: []
+  actions:
+  - action: notify.mobile_app_davids_iphone
+    data:
+      message: Nivel de agua bajo
+      title: Xiaomi Mop 2S
+  mode: single
+- id: '1728732831838'
+  alias: Tag mesa_salon is scanned
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: 5ef270a7-0e28-42f6-92ef-23a4430375a7
+  condition: []
+  action:
+  - type: toggle
+    device_id: 45664a001d7351c5addf19ad6a17c56d
+    entity_id: 0be65f3831ccf067da62067685fd814b
+    domain: switch
+  mode: single
+- id: 087c3f1c5630453b8e0c0232c20d0c26
+  alias: ender.display_status_change
+  description: Notifica cuando el estado de la Ender 3 V3 SE cambia
+  triggers:
+  - entity_id:
+    - sensor.ender_3_v3_se_current_print_state
+    trigger: state
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state.state != ''unavailable'' and trigger.to_state.state
+      != ''unavailable'' }}
+
+      '
+  actions:
+  - data:
+      title: Ender 3 V3 SE
+      message: 'Estado cambiado: {{ trigger.from_state.state }} → {{ trigger.to_state.state
+        }}
+
+        '
+    action: notify.mobile_app_davids_iphone
+  mode: single
+- id: '1740075137241'
+  alias: living.motion
+  description: ''
+  triggers:
+  - type: occupied
+    device_id: e0721b89d8dd1771a38686cba5f5a456
+    entity_id: 1aee10cbb80c2ddcee5ce20952110c3e
+    domain: binary_sensor
+    trigger: device
+  conditions: []
+  actions:
+  - target:
+      entity_id: select.tapo_camera_2f13_move_to_preset
+    data:
+      option: Salon
+    action: select.select_option
+  mode: single
+- id: '1740090000001'
+  alias: alarm.door_opened_alert
+  description: Alarma cuando se abre la puerta o ventanas mientras la rutina de alarma
+    está activa
+  triggers:
+  - entity_id: binary_sensor.door_1_contact
+    to: 'on'
+    trigger: state
+  - entity_id: binary_sensor.window_1_contact
+    to: 'on'
+    trigger: state
+  - entity_id: binary_sensor.window_2_contact
+    to: 'on'
+    trigger: state
+  conditions:
+  - condition: state
+    entity_id: automation.alarm
+    state: 'on'
+  actions:
+  - action: media_player.volume_set
+    target:
+      entity_id:
+      - media_player.dormitorio
+      - media_player.despacho
+    data:
+      volume_level: 1
+  - data:
+      media_content_id: https://cdn.pixabay.com/download/audio/2022/03/09/audio_fb0098c6da.mp3?filename=freesound_community-emergency-alarm-with-reverb-29431.mp3
+      media_content_type: audio/mpeg
+    action: media_player.play_media
+    target:
+      entity_id:
+      - media_player.dormitorio
+      - media_player.despacho
+  - target:
+      entity_id: select.tapo_camera_2f13_move_to_preset
+    data:
+      option: Entrada
+    action: select.select_option
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - target:
+      entity_id: camera.tapo_camera_2f13
+    data:
+      filename: /config/www/alarm_snapshot.jpg
+    action: camera.snapshot
+  - delay:
+      seconds: 2
+  - data:
+      title: "\U0001F6A8 ALARMA ACTIVADA"
+      message: Se ha detectado apertura de puerta.
+      data:
+        attachment:
+          url: http:/192.168.1.222:8123/local/alarm_snapshot.jpg
+        notification_icon: mdi:alarm-light
+        color: red
+    action: notify.mobile_app_davids_iphone
+  - data:
+      title: "\U0001F6A8 ALARMA ACTIVADA"
+      message: Se ha detectado apertura de puerta.
+      data:
+        attachment:
+          url: http://192.168.1.222:8123/local/alarm_snapshot.jpg
+        notification_icon: mdi:alarm-light
+        color: red
+    action: notify.mobile_app_sm_a346b
+  mode: single

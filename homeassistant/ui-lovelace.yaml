@@ -1,0 +1,274 @@
+title: Home
+views:
+  - type: sections
+    path: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - show_name: false
+            show_icon: true
+            show_state: true
+            type: glance
+            entities:
+              - entity: sensor.zhimi_mc2_8977_indoor_temperature
+              - entity: sensor.zhimi_mc2_8977_relative_humidity
+              - entity: sensor.zhimi_mc2_8977_pm25_density
+              - entity: binary_sensor.smoke_detector_smoke
+            state_color: true
+            columns: 4
+            layout_options:
+              grid_columns: full
+
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    entity: switch.light
+                    show_state: false
+                    icon: mdi:lightbulb
+                    icon_height: 50px
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    entity: binary_sensor.motion_1_occupancy
+                    show_state: false
+                    icon_height: 50px
+                    icon: mdi:account
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    icon_height: 50px
+                    entity: binary_sensor.door_1_contact
+                    icon: ''
+                    show_state: false
+            title: Pasillo
+
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: picture-entity
+                    entity: camera.tapo_camera_2f13_hd_stream
+                    camera_image: camera.tapo_camera_2f13_hd_stream
+                    show_name: false
+                    show_state: false
+                    tap_action:
+                      action: more-info
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    show_name: false
+                    show_icon: true
+                    tap_action:
+                      action: perform-action
+                      perform_action: script.move_camera_pasillo
+                      target: {}
+                    show_state: false
+                    icon: mdi:arrow-left
+                    icon_height: 30px
+                    style: |
+                      ha-card {
+                        width: 50%;
+                      }
+                  - type: button
+                    show_name: false
+                    show_icon: true
+                    tap_action:
+                      action: perform-action
+                      perform_action: script.move_camera_salon
+                      target: {}
+                    show_state: false
+                    icon: mdi:arrow-right
+                    icon_height: 30px
+                    style: |
+                      ha-card {
+                        width: 50%;
+                      }
+
+
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    entity: switch.smart_plug_1909122087239425186448e1e9039bc1_outlet
+                    show_state: false
+                    icon: mdi:lightbulb
+                    icon_height: 50px
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    entity: fan.zhimi_mc2_8977_air_purifier
+                    show_state: false
+                    icon_height: 50px
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    icon_height: 50px
+                    entity: remote.salon
+                    icon: mdi:television
+                    show_state: false
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    show_state: false
+                    icon: mdi:window-closed-variant
+                    icon_height: 50px
+                    entity: binary_sensor.window_1_contact
+              - type: horizontal-stack
+                cards:
+                - type: custom:xiaomi-vacuum-map-card
+                  map_source:
+                    camera: camera.xiaomi_robot_vacuum_x20_map
+                  calibration_source:
+                    camera: true
+                  entity: vacuum.xiaomi_robot_vacuum_x20
+                  vacuum_platform: Xiaomi Miio
+            title: Salón
+
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    entity: light.yeelink_color3_6f42_light
+                    show_state: false
+                    icon: ''
+                    icon_height: 50px
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    icon_height: 50px
+                    icon: mdi:television
+                    show_state: false
+                    entity: remote.bedroom_tv
+              - type: horizontal-stack
+                cards:
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    icon_height: 50px
+                    entity: binary_sensor.window_2_contact
+                    icon: mdi:window-closed-variant
+                    show_state: false
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    icon_height: 50px
+                    icon: ''
+                    show_state: false
+                    entity: media_player.dormitorio
+            title: Dormitorio
+
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    show_state: false
+                    icon: mdi:power-plug
+                    icon_height: 50px
+                    entity: switch.plug_1
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    show_state: false
+                    icon: ''
+                    icon_height: 50px
+                    entity: media_player.despacho
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    show_state: false
+                    icon: mdi:printer-3d-nozzle
+                    icon_height: 50px
+                    entity: switch.plug_2
+              - type: picture-entity
+                entity: camera.tapo_camera_3ca0_hd_stream
+                camera_image: camera.tapo_camera_3ca0_hd_stream
+                show_name: false
+                show_state: false
+                tap_action:
+                  action: more-info
+            title: Despacho
+
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    entity: switch.smart_plug_1909121534757325186448e1e903790b_outlet
+                    show_state: false
+                    icon: mdi:power-plug
+                    icon_height: 50px
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    tap_action:
+                      action: toggle
+                    entity: binary_sensor.presence_1_presence
+                    show_state: false
+                    icon: mdi:account
+                    icon_height: 50px
+                  - show_name: false
+                    show_icon: true
+                    type: button
+                    icon_height: 50px
+                    entity: binary_sensor.window_3_contact
+                    icon: mdi:window-closed-variant
+                    show_state: false
+            title: Cocina
+        column_span: 3
+    cards: []
+    badges:
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: person.carolmontaes
+        name: Carol
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: person.destaben
+        name: David
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: automation.alarm
+        icon: mdi:alarm-light
+        name: Alarma
+        tap_action:
+          action: toggle

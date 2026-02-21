@@ -1,0 +1,42 @@
+# Bases de datos generadas automáticamente
+homeassistant/home-assistant*.db*
+homeassistant/zigbee.db
+homeassistant/know_devices.yaml
+
+# Logs
+homeassistant/home-assistant.log*
+logs/
+
+# Archivos generados por Home Assistant
+homeassistant/.HA_VERSION
+homeassistant/.cloud/
+homeassistant/.storage/
+homeassistant/backups/
+homeassistant/deps/
+homeassistant/llmvision/
+homeassistant/media/
+homeassistant/tts/
+
+# Archivos de Docker
+data/
+etc_mosquitto/
+
+# Secretos y credenciales
+homeassistant/secrets.yaml
+.env
+.env.local
+
+# IDE y del sistema
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.pyc
+__pycache__/
+.git/
+
+# Archivos complementarios
+*.backup
+*.tmp

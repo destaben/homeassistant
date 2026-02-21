@@ -1,0 +1,16 @@
+move_camera_pasillo:
+  alias: move_camera_pasillo
+  sequence:
+  - service: select.select_option
+    target:
+      entity_id: select.tapo_camera_2f13_move_to_preset
+    data:
+      option: Entrada
+move_camera_salon:
+  alias: move_camera_salon
+  sequence:
+  - service: select.select_option
+    target:
+      entity_id: select.tapo_camera_2f13_move_to_preset
+    data:
+      option: Salon

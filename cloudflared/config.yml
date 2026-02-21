@@ -1,0 +1,7 @@
+tunnel: homeassistant
+credentials-file: /etc/cloudflared/creds.json
+
+ingress:
+  - hostname: homeassistant.tu-dominio.com
+    service: http://nginx:8080
+  - service: http_status:404

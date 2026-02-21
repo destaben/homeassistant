@@ -1,0 +1,109 @@
+lovelace:
+  dashboards:
+    ui-lovelace:
+      mode: yaml
+      title: Principal
+      icon: mdi:home
+      show_in_sidebar: true
+      filename: ui-lovelace.yaml
+api:
+logbook:
+history:
+
+assist_pipeline:
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.1.222
+    - 127.0.0.1
+    - ::1
+    - 172.20.0.0/16  # Red Docker homeassistant-net (nginx)
+  ip_ban_enabled: true
+  login_attempts_threshold: 3
+template:
+  - sensor:
+      - name: "Calendar Message"
+        state: "{{ state_attr('calendar.homeassistant', 'message') }}"
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+
+mqtt:
+  switch:
+    - name: "light_1_mqtt"
+      state_topic: "zigbee2mqtt/light_1"
+      command_topic: "zigbee2mqtt/light_1/set"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      value_template: "{{ value_json.state }}"
+      qos: 1
+      retain: true
+
+    - name: "light_2_mqtt"
+      state_topic: "zigbee2mqtt/light_2"
+      command_topic: "zigbee2mqtt/light_2/set"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      value_template: "{{ value_json.state }}"
+      qos: 1
+      retain: true
+
+    - name: "light_3_mqtt"
+      state_topic: "zigbee2mqtt/light_3"
+      command_topic: "zigbee2mqtt/light_3/set"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      value_template: "{{ value_json.state }}"
+      qos: 1
+      retain: true
+
+    - name: "light_4_mqtt"
+      state_topic: "zigbee2mqtt/light_4"
+      command_topic: "zigbee2mqtt/light_4/set"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      value_template: "{{ value_json.state }}"
+      qos: 1
+      retain: true
+
+    - name: "light_5_mqtt"
+      state_topic: "zigbee2mqtt/light_5"
+      command_topic: "zigbee2mqtt/light_5/set"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      value_template: "{{ value_json.state }}"
+      qos: 1
+      retain: true
+
+    - name: "light_6_mqtt"
+      state_topic: "zigbee2mqtt/light_6"
+      command_topic: "zigbee2mqtt/light_6/set"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      value_template: "{{ value_json.state }}"
+      qos: 1
+      retain: true
+
+    - name: "light_7_mqtt"
+      state_topic: "zigbee2mqtt/light_7"
+      command_topic: "zigbee2mqtt/light_7/set"
+      payload_on: '{"state": "ON"}'
+      payload_off: '{"state": "OFF"}'
+      state_on: "ON"
+      state_off: "OFF"
+      value_template: "{{ value_json.state }}"
+      qos: 1
+      retain: true
