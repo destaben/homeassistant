@@ -1,74 +1,74 @@
-# Home Assistant - Disaster Recovery Backup
+# Home Assistant - Disaster Recovery Configuration
 
-Configuración completa de Home Assistant para restauración ante desastre total.
+Complete Home Assistant configuration for full disaster recovery and restoration.
 
-## 📋 Contenido del Repositorio
+## 📋 Repository Contents
 
-### Archivos principales
+### Main Files
 
-- **`docker-compose.yaml`** - Definición de servicios (Home Assistant, Nginx, Cloudflared, Zigbee2MQTT, Mosquitto)
-- **`nginx.conf`** - Configuración del proxy reverso con filtrado de endpoints
-- **`cloudflared/config.yml`** - Configuración del túnel Cloudflare
-- **`.env.example`** - Template de variables de entorno
-- **`.gitignore`** - Archivos a ignorar (secrets, bases de datos, logs)
+- **`docker-compose.yaml`** - Service definitions (Home Assistant, Nginx, Cloudflared, Zigbee2MQTT, Mosquitto)
+- **`nginx.conf`** - Reverse proxy configuration with endpoint filtering
+- **`cloudflared/config.yml`** - Cloudflare tunnel configuration
+- **`.env.example`** - Environment variables template
+- **`.gitignore`** - Files to ignore (secrets, databases, logs)
 
-### Directorio `homeassistant/`
+### `homeassistant/` Directory
 
-**Configuración (restaurable):**
-- `configuration.yaml` - Configuración base
-- `automations.yaml` - Automaciones personalizadas
-- `scripts.yaml` - Scripts personalizados
-- `scenes.yaml` - Escenas
-- `ui-lovelace.yaml` - Dashboard personalizado
-- `blueprints/` - Blueprints personalizados
-- `custom_components/` - Componentes instalados
-- `www/` - Archivos estáticos personalizados
+**Restorable Configuration:**
+- `configuration.yaml` - Base configuration
+- `automations.yaml` - Custom automations
+- `scripts.yaml` - Custom scripts
+- `scenes.yaml` - Scenes
+- `ui-lovelace.yaml` - Custom dashboard
+- `blueprints/` - Custom blueprints
+- `custom_components/` - Installed components
+- `www/` - Custom static files
 
-**NO incluido (se genera automáticamente):**
-- Bases de datos (`*.db`, `*.db-wal`, `*.db-shm`)
+**NOT included (auto-generated):**
+- Databases (`*.db`, `*.db-wal`, `*.db-shm`)
 - Logs (`home-assistant.log*`)
-- Caché y archivos de sistema (`.storage/`, `.cloud/`, `deps/`)
-- Archivos generados (`media/`, `tts/`, `backups/`)
+- Cache and system files (`.storage/`, `.cloud/`, `deps/`)
+- Generated files (`media/`, `tts/`, `backups/`)
 
-### Directorio `mosquitto_config/`
+### `mosquitto_config/` Directory
 
-- `mosquitto.conf` - Configuración de MQTT
-- `mosquitto_certs.sh` - Script para generar certificados
+- `mosquitto.conf` - MQTT configuration
+- `mosquitto_certs.sh` - Certificate generation script
 
-## 🚀 Restauración desde cero
+## 🚀 Full Restoration from Scratch
 
-### 1. Clonar el repositorio
+### 1. Clone the repository
 ```bash
 git clone https://github.com/destaben/homeassistant.git
 cd homeassistant
 ```
 
-### 2. Configurar variables de entorno
+### 2. Configure environment variables
 ```bash
 cp .env.example .env
-# Edita .env y agrega tu CLOUDFLARE_TUNNEL_TOKEN
+# Edit .env and add your CLOUDFLARE_TUNNEL_TOKEN
 ```
 
-### 3. Configurar secretos (si los hay)
+### 3. Configure secrets (if any)
 ```bash
 cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
-# Edita y agrega tus credenciales
+# Edit and add your credentials
 ```
 
-### 4. Actualizar configuración de Cloudflare
-Edita `cloudflared/config.yml` y reemplaza `homeassistant.tu-dominio.com` con tu dominio
+### 4. Update Cloudflare configuration
+Edit `cloudflared/config.yml` and replace `homeassistant.tu-dominio.com` with your domain
 
-### 5. Construir e iniciar los contenedores
+### 5. Build and start containers
 ```bash
 docker-compose up -d
 ```
 
-### 6. Restaurar datos adicionales (si existen)
-Si tienes backups de Home Assistant, restaura desde la interfaz:
-1. Abre `http://localhost:8123`
-2. Configuración → Sistema → Backups → Restaurar
+### 6. Restore additional data (if exists)
+If you have Home Assistant backups, restore from the interface:
+1. Open `http://localhost:8123`
+2. Settings → System → Backups → Restore
 
-## 📁 Estructura de directorios esperada
+## 📁 Expected Directory Structure
 
 ```
 /home/bmax/homeassistant/
@@ -84,7 +84,7 @@ Si tienes backups de Home Assistant, restaura desde la interfaz:
 │   ├── automations.yaml
 │   ├── scripts.yaml
 │   ├── scenes.yaml
-│   ├── secrets.yaml (⚠️ no versionado)
+│   ├── secrets.yaml (⚠️ not versioned)
 │   ├── ui-lovelace.yaml
 │   ├── blueprints/
 │   ├── custom_components/
@@ -92,46 +92,46 @@ Si tienes backups de Home Assistant, restaura desde la interfaz:
 ├── mosquitto_config/
 │   ├── mosquitto.conf
 │   └── mosquitto_certs.sh
-└── README.md (este archivo)
+└── README.md (this file)
 ```
 
-## 🔐 Seguridad
+## 🔐 Security
 
-⚠️ **Importante:**
-- Nunca subas `secrets.yaml` al repositorio
-- Nunca subas `homeassistant/secrets.yaml`
-- Usa variables de entorno para credenciales
-- El repositorio debe ser **privado**
+⚠️ **Important:**
+- Never commit `secrets.yaml` to the repository
+- Never commit `homeassistant/secrets.yaml`
+- Use environment variables for credentials
+- Repository must be **private**
 
-## 📝 Notas
+## 📝 Notes
 
-- Las bases de datos de Home Assistant se crearán automáticamente en la primera ejecución
-- Los certificados de Mosquitto se generarán automáticamente si no existen
-- Si usas Zigbee2MQTT, la configuración está en `docker-compose.yaml`
-- El proxy Nginx filtra automáticamente para exponer solo endpoints públicos necesarios
+- Home Assistant databases will be created automatically on first run
+- Mosquitto certificates will be generated automatically if they don't exist
+- If using Zigbee2MQTT, configuration is in `docker-compose.yaml`
+- Nginx proxy automatically filters to expose only necessary public endpoints
 
-## 🔄 Actualizaciones
+## 🔄 Updates
 
-Después de cualquier cambio en la configuración:
+After any configuration changes:
 
 ```bash
 git add .
-git commit -m "Descripción del cambio"
+git commit -m "Description of change"
 git push
 ```
 
-Solo se sincronizarán archivos de configuración. Los datos generados se ignoran automáticamente.
+Only configuration files will be synced. Generated data is automatically ignored.
 
-## ❓ Preguntas frecuentes
+## ❓ Frequently Asked Questions
 
-**P: ¿Por qué no se incluyen los backups?**
-R: Los backups son grandes e innecesarios. Están protegidos dentro de Home Assistant.
+**Q: Why aren't backups included?**
+A: Backups are large and unnecessary. They're protected within Home Assistant.
 
-**P: ¿Se restaurarán automáticamente mis dispositivos conectados?**
-R: No. Algunos requerirán reconexión (Zigbee, Z-Wave, etc.). Los secrets y credenciales son necesarios.
+**Q: Will my connected devices be automatically restored?**
+A: No. Some will require reconnection (Zigbee, Z-Wave, etc.). Secrets and credentials are required.
 
-**P: ¿Puedo usar esto en otra máquina?**
-R: Sí, solo cambia:
-- IP en `nginx.conf` (si es diferente)
-- Variables en `.env`
-- Dominio en `cloudflared/config.yml`
+**Q: Can I use this on another machine?**
+A: Yes, just change:
+- IP in `nginx.conf` (if different)
+- Variables in `.env`
+- Domain in `cloudflared/config.yml`
