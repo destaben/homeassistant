@@ -11,39 +11,6 @@ services:
     privileged: true
     network_mode: host
 
-  nginx:
-    container_name: nginx-proxy
-    image: nginx:latest
-    restart: unless-stopped
-    network_mode: host
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - homeassistant
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  cloudflared:
-    container_name: cloudflared
-    image: cloudflare/cloudflared:latest
-    restart: unless-stopped
-    command: tunnel run
-    network_mode: host
-    volumes:
-      - ./cloudflared:/etc/cloudflared:ro
-    depends_on:
-      - nginx
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
   zigbee2mqtt:
     container_name: zigbee2mqtt
     image: koenkk/zigbee2mqtt:1.39.1
@@ -68,6 +35,40 @@ services:
     volumes:
       - ./etc_mosquitto:/etc/mosquitto
       - ./mosquitto_config:/mosquitto/config/
+      
+  # Only needed if you want to enable gassistant integration
+  #nginx:
+  #  container_name: nginx-proxy
+  #  image: nginx:latest
+  #  restart: unless-stopped
+  #  network_mode: host
+  #  volumes:
+  #    - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #  depends_on:
+  #    - homeassistant
+  #  logging:
+  #    driver: "json-file"
+  #    options:
+  #      max-size: "10m"
+  #      max-file: "3"
+
+  #cloudflared:
+  #  container_name: cloudflared
+  #  image: cloudflare/cloudflared:latest
+  #  restart: unless-stopped
+  #  command: tunnel run
+  #  network_mode: host
+  #  volumes:
+  #    - ./cloudflared:/etc/cloudflared:ro
+  #  depends_on:
+  #    - nginx
+  #  environment:
+  #    - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+  #  logging:
+  #    driver: "json-file"
+  #    options:
+  #      max-size: "10m"
+  #      max-file: "3"
 
 networks:
   homeassistant-net:
