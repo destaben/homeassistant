@@ -23,6 +23,7 @@ homeassistant/media/
 homeassistant/tts/
 
 # Docker files
+!data/configuration.yaml
 data/
 etc_mosquitto/
 
@@ -45,3 +46,4 @@ __pycache__/
 # Temporary files
 *.backup
 *.tmp
+.ha_run.lock
