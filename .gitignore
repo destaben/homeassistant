@@ -23,7 +23,7 @@ homeassistant/media/
 homeassistant/tts/
 
 # Docker files
-!data/configuration.yaml
+data/!configuration.yaml
 data/
 etc_mosquitto/
 
