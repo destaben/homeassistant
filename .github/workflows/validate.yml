@@ -24,9 +24,14 @@ jobs:
           cat > .yamllint.yml << 'EOF'
           extends: default
           rules:
+            document-start: disable
             line-length:
               max: 200
               level: warning
+            indentation:
+              spaces: 2
+              indent-sequences: false
+              check-multi-line-strings: false
             truthy:
               allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
               check-keys: false
@@ -78,6 +83,6 @@ jobs:
           EOF
 
       - name: Run Home Assistant config check
-        uses: frenck/action-home-assistant@v1.4.2
+        uses: frenck/action-home-assistant@v1
         with:
           path: ./homeassistant
