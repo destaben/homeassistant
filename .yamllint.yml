@@ -1,0 +1,14 @@
+extends: default
+rules:
+  document-start: disable
+  # HA YAML mixes indent-sequences styles (UI-generated vs hand-written).
+  # Disabling avoids false positives across all config files.
+  indentation: disable
+  line-length:
+    max: 200
+    level: warning
+  truthy:
+    allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
