@@ -18,7 +18,6 @@ http:
     - 192.168.1.222
     - 127.0.0.1
     - ::1
-    - 172.20.0.0/16  # Red Docker homeassistant-net (nginx)
   ip_ban_enabled: true
   login_attempts_threshold: 3
 template:

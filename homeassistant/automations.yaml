@@ -1,8 +1,8 @@
 - alias: button1.short_press
   trigger:
-  - platform: state
-    entity_id: sensor.button_1_action
-    to: single
+  - platform: mqtt
+    topic: zigbee2mqtt/button_1/action
+    payload: "single"
   condition: []
   action:
   - service: switch.toggle
@@ -12,9 +12,9 @@
   id: 85d5859e1db641a1888261c7e50bc843
 - alias: button1.doble_press
   trigger:
-  - platform: state
-    entity_id: sensor.button_1_action
-    to: double
+  - platform: mqtt
+    topic: zigbee2mqtt/button_1/action
+    payload: "double"
   condition: []
   action:
   - service: switch.toggle
@@ -25,9 +25,9 @@
 - id: eeb7f48406454e96a0b3355b96222859
   alias: button1.long_press
   triggers:
-  - entity_id: sensor.button_1_action
-    to: hold
-    trigger: state
+  - trigger: mqtt
+    topic: zigbee2mqtt/button_1/action
+    payload: "hold"
   conditions: []
   actions:
   - choose:
@@ -362,9 +362,9 @@
   id: 0e4dc94853ee44db8d30a0a2e8533068
 - alias: button2.short_press
   trigger:
-  - platform: state
-    entity_id: sensor.button_2_action
-    to: single
+  - platform: mqtt
+    topic: zigbee2mqtt/button_2/action
+    payload: "single"
   condition: []
   action:
   - service: light.toggle
@@ -374,9 +374,9 @@
   id: 26d7f3df55a04a4ead7a82040395a6bb
 - alias: button2.double_press
   trigger:
-  - platform: state
-    entity_id: sensor.button_2_action
-    to: double
+  - platform: mqtt
+    topic: zigbee2mqtt/button_2/action
+    payload: "double"
   condition: []
   action:
   - service: switch.turn_off
@@ -392,9 +392,9 @@
 - id: b1b3f8d4c2e5a6f7g9h0i1j2k3l4m5n6
   alias: button2.long_press
   triggers:
-  - entity_id: sensor.button_2_action
-    to: hold
-    trigger: state
+  - trigger: mqtt
+    topic: zigbee2mqtt/button_2/action
+    payload: "hold"
   conditions: []
   actions:
   - choose:
