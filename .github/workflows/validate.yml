@@ -1,0 +1,83 @@
+name: Validate Configuration
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    paths:
+      - "homeassistant/**/*.yaml"
+      - "docker-compose.yaml"
+      - "nginx.conf"
+
+jobs:
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Create yamllint config
+        run: |
+          cat > .yamllint.yml << 'EOF'
+          extends: default
+          rules:
+            line-length:
+              max: 200
+              level: warning
+            truthy:
+              allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
+              check-keys: false
+            comments:
+              min-spaces-from-content: 1
+          EOF
+
+      - name: Lint HA YAML files
+        run: |
+          yamllint -c .yamllint.yml \
+            homeassistant/configuration.yaml \
+            homeassistant/automations.yaml \
+            homeassistant/scripts.yaml \
+            homeassistant/scenes.yaml \
+            homeassistant/ui-lovelace.yaml
+
+  docker-compose-validate:
+    name: Docker Compose Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create dummy .env
+        run: |
+          echo "CLOUDFLARE_TUNNEL_TOKEN=dummy_token_for_ci" > .env
+
+      - name: Validate docker-compose.yaml
+        run: docker compose config --quiet
+
+  ha-config-check:
+    name: Home Assistant Config Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create dummy secrets.yaml for CI
+        run: |
+          cat > homeassistant/secrets.yaml << 'EOF'
+          google_api_key: "ci-placeholder"
+          openweather_api_key: "ci-placeholder"
+          my_username: "ci-user"
+          my_password: "ci-password"
+          external_url: "https://example.com"
+          internal_url: "http://192.168.1.1:8123"
+          mqtt_user: "ci-mqtt"
+          mqtt_password: "ci-mqtt-password"
+          latitude: 40.416775
+          longitude: -3.703790
+          EOF
+
+      - name: Run Home Assistant config check
+        uses: frenck/action-home-assistant@v1.4.2
+        with:
+          path: ./homeassistant

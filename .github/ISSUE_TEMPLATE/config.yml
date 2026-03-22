@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Home Assistant Community
+    url: https://community.home-assistant.io
+    about: For general Home Assistant questions and help
+  - name: Zigbee2MQTT Documentation
+    url: https://www.zigbee2mqtt.io
+    about: Zigbee device pairing and configuration reference
