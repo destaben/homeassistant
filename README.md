@@ -1,137 +1,154 @@
-# Home Assistant - Disaster Recovery Configuration
+# Home Assistant — Configuration as Code
 
-Complete Home Assistant configuration for full disaster recovery and restoration.
+Self-hosted smart home running on Docker Compose. This repository is a full disaster-recovery snapshot of all configuration.
 
-## 📋 Repository Contents
+## Stack
 
-### Main Files
+| Service | Image | Role |
+|---|---|---|
+| Home Assistant | `ghcr.io/home-assistant/home-assistant:2026.2` | Core platform |
+| Zigbee2MQTT | `koenkk/zigbee2mqtt:2.8.0` | Zigbee coordinator (Sonoff 3.0 USB) |
+| Mosquitto | `eclipse-mosquitto:2.0` | MQTT broker |
+| nginx | `nginx:stable` | Security reverse proxy for Google Assistant OAuth *(disabled)* |
+| Cloudflared | `cloudflare/cloudflared` | External tunnel via `hassistant.destaben.dev` *(disabled)* |
 
-- **`docker-compose.yaml`** - Service definitions (Home Assistant, Nginx, Cloudflared, Zigbee2MQTT, Mosquitto)
-- **`nginx.conf`** - Reverse proxy configuration with endpoint filtering
-- **`cloudflared/config.yml`** - Cloudflare tunnel configuration
-- **`.env.example`** - Environment variables template
-- **`.gitignore`** - Files to ignore (secrets, databases, logs)
+> nginx and cloudflared are currently commented out in `docker-compose.yaml`. See [#5](https://github.com/destaben/homeassistant/issues/5) to re-enable.
 
-### `homeassistant/` Directory
+## Repository Layout
 
-**Restorable Configuration:**
-- `configuration.yaml` - Base configuration
-- `automations.yaml` - Custom automations
-- `scripts.yaml` - Custom scripts
-- `scenes.yaml` - Scenes
-- `ui-lovelace.yaml` - Custom dashboard
-- `blueprints/` - Custom blueprints
-- `custom_components/` - Installed components
-- `www/` - Custom static files
+```
+homeassistant/              # HA config (bind-mounted to /config in container)
+  configuration.yaml        # HTTP, MQTT switches, templates, integrations
+  automations.yaml          # All automations (dot-notation aliases)
+  scripts.yaml              # Reusable scripts (camera presets)
+  scenes.yaml               # Scene definitions
+  ui-lovelace.yaml          # YAML-mode dashboard
+  secrets.yaml.example      # Secret key template — copy to secrets.yaml
+  secrets.yaml              # ⚠️ NOT versioned — contains real credentials
+  custom_components/        # ⚠️ NOT versioned — installed via HACS
+  blueprints/               # ⚠️ NOT versioned
+  www/                      # ⚠️ NOT versioned — LLM Vision snapshots, etc.
 
-**NOT included (auto-generated):**
-- Databases (`*.db`, `*.db-wal`, `*.db-shm`)
-- Logs (`home-assistant.log*`)
-- Cache and system files (`.storage/`, `.cloud/`, `deps/`)
-- Generated files (`media/`, `tts/`, `backups/`)
+data/                       # ⚠️ NOT versioned — Zigbee2MQTT state + network key
+mosquitto_config/           # Mosquitto static config (versioned)
+etc_mosquitto/              # ⚠️ NOT versioned — runtime certs/passwd
+nginx.conf                  # Reverse proxy config (versioned)
+cloudflared/config.yml      # Tunnel config (versioned)
+docker-compose.yaml         # All service definitions (versioned)
+.env.example                # Env var template — copy to .env
+.env                        # ⚠️ NOT versioned — Cloudflare tunnel token
+AGENTS.md                   # AI agent rules and device reference
+.github/
+  copilot-instructions.md   # GitHub Copilot workspace context
+  workflows/validate.yml    # CI: yamllint + docker-compose + HA config check
+  ISSUE_TEMPLATE/           # Bug, feature, security issue templates
+```
 
-### `mosquitto_config/` Directory
+## Disaster Recovery
 
-- `mosquitto.conf` - MQTT configuration
-- `mosquitto_certs.sh` - Certificate generation script
+### 1. Clone
 
-## 🚀 Full Restoration from Scratch
-
-### 1. Clone the repository
 ```bash
 git clone https://github.com/destaben/homeassistant.git
 cd homeassistant
 ```
 
-### 2. Configure environment variables
+### 2. Create secrets
+
 ```bash
 cp .env.example .env
-# Edit .env and add your CLOUDFLARE_TUNNEL_TOKEN
-```
+# Edit .env — add CLOUDFLARE_TUNNEL_TOKEN
 
-### 3. Configure secrets (if any)
-```bash
 cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
-# Edit and add your credentials
+# Edit secrets.yaml — add all credentials
 ```
 
-### 4. Update Cloudflare configuration
-Edit `cloudflared/config.yml` and replace `homeassistant.tu-dominio.com` with your domain
+### 3. Restore Zigbee2MQTT config
 
-### 5. Build and start containers
-```bash
-docker-compose up -d
-```
+`data/` is gitignored because it contains the Zigbee network key. You need to either:
+- Restore `data/configuration.yaml` from a secure backup, **or**
+- Re-pair all Zigbee devices via the Zigbee2MQTT dashboard after first boot
 
-### 6. Restore additional data (if exists)
-If you have Home Assistant backups, restore from the interface:
-1. Open `http://localhost:8123`
-2. Settings → System → Backups → Restore
-
-## 📁 Expected Directory Structure
-
-```
-/home/bmax/homeassistant/
-├── docker-compose.yaml
-├── nginx.conf
-├── .env
-├── .env.example
-├── .gitignore
-├── cloudflared/
-│   └── config.yml
-├── homeassistant/
-│   ├── configuration.yaml
-│   ├── automations.yaml
-│   ├── scripts.yaml
-│   ├── scenes.yaml
-│   ├── secrets.yaml (⚠️ not versioned)
-│   ├── ui-lovelace.yaml
-│   ├── blueprints/
-│   ├── custom_components/
-│   └── www/
-├── mosquitto_config/
-│   ├── mosquitto.conf
-│   └── mosquitto_certs.sh
-└── README.md (this file)
-```
-
-## 🔐 Security
-
-⚠️ **Important:**
-- Never commit `secrets.yaml` to the repository
-- Never commit `homeassistant/secrets.yaml`
-- Use environment variables for credentials
-- Repository must be **private**
-
-## 📝 Notes
-
-- Home Assistant databases will be created automatically on first run
-- Mosquitto certificates will be generated automatically if they don't exist
-- If using Zigbee2MQTT, configuration is in `docker-compose.yaml`
-- Nginx proxy automatically filters to expose only necessary public endpoints
-
-## 🔄 Updates
-
-After any configuration changes:
+### 4. Start services
 
 ```bash
-git add .
-git commit -m "Description of change"
+docker compose up -d
+```
+
+Home Assistant will be available at `http://localhost:8123`.
+
+### 5. Restore HA state (optional)
+
+If you have a Home Assistant backup (.tar), restore it from:
+**Settings → System → Backups → Restore**
+
+> Databases, `.storage/`, integrations state, and entity registry are NOT in this repo — they live in HA backups.
+
+### 6. Re-install custom components
+
+Custom components (HACS integrations) are gitignored. After first boot:
+1. Install HACS from the [official instructions](https://hacs.xyz/docs/use/download/download/)
+2. Re-install: `dreame_vacuum`, `edata`, `meross_lan`, `meshtastic`, `moonraker`, `tapo_control`, `xiaomi_miot`, `llmvision`, `bluetti_bt`
+
+## Custom Components
+
+| Component | Purpose |
+|---|---|
+| `bluetti_bt` | Bluetti power station via Bluetooth |
+| `dreame_vacuum` | Dreame/Xiaomi robot vacuum (X20) |
+| `edata` | Spanish electricity consumption (PVPC) |
+| `hacs` | Community Store |
+| `meross_lan` | Meross smart plugs via LAN |
+| `meshtastic` | LoRa mesh radio |
+| `moonraker` | 3D printer (Ender 3 V3 SE) |
+| `tapo_control` | TP-Link Tapo cameras (PTZ, snapshots) |
+| `xiaomi_miot` | Xiaomi air purifier + vacuum |
+| `llmvision` | LLM-powered camera analysis |
+
+## CI / Validation
+
+Every push to `main` runs three checks via GitHub Actions:
+
+| Job | What it checks |
+|---|---|
+| **YAML Lint** | Syntax of all HA YAML files via `yamllint` |
+| **Docker Compose Validate** | `docker compose config --quiet` |
+| **HA Config Check** | `frenck/action-home-assistant` — integration and service validation |
+
+Run locally before pushing:
+```bash
+pip install yamllint
+yamllint -c .yamllint.yml homeassistant/configuration.yaml homeassistant/automations.yaml
+docker compose config --quiet
+```
+
+## Open Issues
+
+See [GitHub Issues](https://github.com/destaben/homeassistant/issues) for the full backlog. Priority items:
+
+| # | Title | Priority |
+|---|---|---|
+| [#1](https://github.com/destaben/homeassistant/issues/1) | Zigbee network key in plaintext | 🔴 Critical |
+| [#2](https://github.com/destaben/homeassistant/issues/2) | MQTT anonymous access | 🔴 High |
+| [#3](https://github.com/destaben/homeassistant/issues/3) | nginx /auth/token blocks POST | 🟠 High |
+| [#7](https://github.com/destaben/homeassistant/issues/7) | Replace manual MQTT lights with auto-discovery | 🟡 Medium |
+| [#14](https://github.com/destaben/homeassistant/issues/14) | AI Vision epic | 🤖 Epic |
+| [#15](https://github.com/destaben/homeassistant/issues/15) | Conversational AI epic | 🤖 Epic |
+| [#16](https://github.com/destaben/homeassistant/issues/16) | Agentic AI ReAct loop epic | 🤖 Epic |
+
+## Security Notes
+
+- `secrets.yaml`, `.env`, `data/`, `etc_mosquitto/` are gitignored — never force-add them
+- All credentials must use `!secret` references — never inline values
+- MQTT currently allows anonymous connections ([#2](https://github.com/destaben/homeassistant/issues/2)) — fix before exposing externally
+- HA container runs `privileged: true` ([#9](https://github.com/destaben/homeassistant/issues/9)) — reduce when integration compatibility allows
+
+## Updating
+
+```bash
+git add homeassistant/automations.yaml homeassistant/configuration.yaml  # etc.
+git commit -m "feat(automation): describe what changed"
 git push
 ```
 
-Only configuration files will be synced. Generated data is automatically ignored.
-
-## ❓ Frequently Asked Questions
-
-**Q: Why aren't backups included?**
-A: Backups are large and unnecessary. They're protected within Home Assistant.
-
-**Q: Will my connected devices be automatically restored?**
-A: No. Some will require reconnection (Zigbee, Z-Wave, etc.). Secrets and credentials are required.
-
-**Q: Can I use this on another machine?**
-A: Yes, just change:
-- IP in `nginx.conf` (if different)
-- Variables in `.env`
-- Domain in `cloudflared/config.yml`
+Only tracked config files sync. All runtime data is gitignored.
