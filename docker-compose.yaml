@@ -22,6 +22,10 @@ services:
         - 8082:8080
     environment:
         - TZ=Europe/Madrid
+        # Zigbee2MQTT maps ZIGBEE2MQTT_CONFIG_ADVANCED_* env vars to the advanced: config section
+        - ZIGBEE2MQTT_CONFIG_ADVANCED_NETWORK_KEY=${ZIGBEE2MQTT_NETWORK_KEY}
+        - ZIGBEE2MQTT_CONFIG_ADVANCED_PAN_ID=${ZIGBEE2MQTT_PAN_ID}
+        - ZIGBEE2MQTT_CONFIG_ADVANCED_EXT_PAN_ID=${ZIGBEE2MQTT_EXT_PAN_ID}
     devices:
         - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_fc0671e16fbeed119095a04838a92db5-if00-port0:/dev/ttyACM0
 

@@ -57,17 +57,31 @@ cd homeassistant
 
 ```bash
 cp .env.example .env
-# Edit .env — add CLOUDFLARE_TUNNEL_TOKEN
+# Edit .env — add CLOUDFLARE_TUNNEL_TOKEN and Zigbee secrets (see below)
 
 cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
 # Edit secrets.yaml — add all credentials
 ```
 
-### 3. Restore Zigbee2MQTT config
+### 3. Set Zigbee2MQTT network secrets
 
-`data/` is gitignored because it contains the Zigbee network key. You need to either:
-- Restore `data/configuration.yaml` from a secure backup, **or**
-- Re-pair all Zigbee devices via the Zigbee2MQTT dashboard after first boot
+The Zigbee network encryption key, PAN ID, and Extended PAN ID are supplied via
+environment variables so they never need to be stored in `data/configuration.yaml`.
+Set these in your `.env` file:
+
+```bash
+# Generate a new 16-byte network key (if setting up from scratch):
+python3 -c "import os, json; print(json.dumps(list(os.urandom(16))))"
+
+ZIGBEE2MQTT_NETWORK_KEY=[YOUR_16_INT_ARRAY_HERE]
+ZIGBEE2MQTT_PAN_ID=YOUR_PAN_ID_HERE
+ZIGBEE2MQTT_EXT_PAN_ID=[YOUR_8_INT_ARRAY_HERE]
+```
+
+> ⚠️ Replace the example values above with your own. Never commit real keys.
+>
+> If starting fresh, generate a new key and re-pair all Zigbee devices. If
+> restoring from backup, use the original values from your secure backup.
 
 ### 4. Start services
 
@@ -128,7 +142,7 @@ See [GitHub Issues](https://github.com/destaben/homeassistant/issues) for the fu
 
 | # | Title | Priority |
 |---|---|---|
-| [#1](https://github.com/destaben/homeassistant/issues/1) | Zigbee network key in plaintext | 🔴 Critical |
+| [#1](https://github.com/destaben/homeassistant/issues/1) | Zigbee network key in plaintext | ✅ Fixed — env vars |
 | [#2](https://github.com/destaben/homeassistant/issues/2) | MQTT anonymous access | 🔴 High |
 | [#3](https://github.com/destaben/homeassistant/issues/3) | nginx /auth/token blocks POST | 🟠 High |
 | [#7](https://github.com/destaben/homeassistant/issues/7) | Replace manual MQTT lights with auto-discovery | 🟡 Medium |
