@@ -273,7 +273,7 @@ mqtt:
       expire_after: 86400
 
   device_tracker:
-    - name: "d3st"
+    - name: "Meshtastic d3st"
       unique_id: "meshtastic_d3st_tracker"
       state_topic: !secret meshtastic_d3st_topic
       json_attributes_topic: !secret meshtastic_d3st_topic
@@ -288,7 +288,7 @@ mqtt:
         {% endif %}
       source_type: gps
 
-    - name: "Layana"
+    - name: "Meshtastic Layana"
       unique_id: "meshtastic_layana_tracker"
       state_topic: !secret meshtastic_layana_topic
       json_attributes_topic: !secret meshtastic_layana_topic
