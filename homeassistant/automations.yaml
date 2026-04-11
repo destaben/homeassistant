@@ -2,7 +2,7 @@
   trigger:
   - platform: mqtt
     topic: zigbee2mqtt/button_1/action
-    payload: "single"
+    payload: single
   condition: []
   action:
   - service: switch.toggle
@@ -14,7 +14,7 @@
   trigger:
   - platform: mqtt
     topic: zigbee2mqtt/button_1/action
-    payload: "double"
+    payload: double
   condition: []
   action:
   - service: switch.toggle
@@ -27,7 +27,7 @@
   triggers:
   - trigger: mqtt
     topic: zigbee2mqtt/button_1/action
-    payload: "hold"
+    payload: hold
   conditions: []
   actions:
   - choose:
@@ -237,9 +237,9 @@
   actions:
   - data:
       preset_mode: Auto
+    action: fan.set_preset_mode
     target:
       entity_id: fan.zhimi_mc2_8977_air_purifier
-    action: fan.set_preset_mode
   - device_id: 55827bd0d1fec5ae41e9876eb5b02f5a
     domain: vacuum
     entity_id: 9c95d53ac4514e594fdd4f1672892293
@@ -364,7 +364,7 @@
   trigger:
   - platform: mqtt
     topic: zigbee2mqtt/button_2/action
-    payload: "single"
+    payload: single
   condition: []
   action:
   - service: light.toggle
@@ -376,7 +376,7 @@
   trigger:
   - platform: mqtt
     topic: zigbee2mqtt/button_2/action
-    payload: "double"
+    payload: double
   condition: []
   action:
   - service: switch.turn_off
@@ -394,7 +394,7 @@
   triggers:
   - trigger: mqtt
     topic: zigbee2mqtt/button_2/action
-    payload: "hold"
+    payload: hold
   conditions: []
   actions:
   - choose:
