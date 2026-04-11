@@ -501,9 +501,9 @@
     action: select.select_option
   mode: single
 - id: '1740090000001'
-  alias: alarm.door_opened_alert
-  description: Alarma cuando se abre la puerta o ventanas mientras la rutina de alarma
-    está activa
+  alias: alarm.security_alert
+  description: Envía alerta con snapshot de cámara cuando se detecta apertura de
+    puerta o ventana mientras la alarma está activa. Cooldown de 5 minutos entre alertas.
   triggers:
   - entity_id: binary_sensor.door_1_contact
     to: 'on'
@@ -514,10 +514,15 @@
   - entity_id: binary_sensor.window_2_contact
     to: 'on'
     trigger: state
+  - entity_id: binary_sensor.window_3_contact
+    to: 'on'
+    trigger: state
   conditions:
   - condition: state
     entity_id: automation.alarm
     state: 'on'
+  - condition: template
+    value_template: "{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds() > 300 }}" # cooldown 5 min
   actions:
   - action: media_player.volume_set
     target:
@@ -540,32 +545,41 @@
       option: Entrada
     action: select.select_option
   - delay:
-      hours: 0
-      minutes: 0
       seconds: 5
-      milliseconds: 0
+  - variables:
+      snapshot_ts: "{{ now().strftime('%Y%m%d_%H%M%S') }}"
   - target:
       entity_id: camera.tapo_camera_2f13
     data:
-      filename: /config/www/alarm_snapshot.jpg
+      filename: "/config/www/snapshots/alarm_{{ snapshot_ts }}.jpg"
     action: camera.snapshot
   - delay:
       seconds: 2
   - data:
       title: "\U0001F6A8 ALARMA ACTIVADA"
-      message: Se ha detectado apertura de puerta.
+      message: "{{ trigger.to_state.attributes.friendly_name }} activado mientras la alarma está activa"
       data:
         attachment:
-          url: http:/192.168.1.222:8123/local/alarm_snapshot.jpg
+          url: "http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts }}.jpg"
+        push:
+          sound:
+            name: default
+            critical: 1
+            volume: 1.0
         notification_icon: mdi:alarm-light
         color: red
     action: notify.mobile_app_davids_iphone
   - data:
       title: "\U0001F6A8 ALARMA ACTIVADA"
-      message: Se ha detectado apertura de puerta.
+      message: "{{ trigger.to_state.attributes.friendly_name }} activado mientras la alarma está activa"
       data:
         attachment:
-          url: http://192.168.1.222:8123/local/alarm_snapshot.jpg
+          url: "http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts }}.jpg"
+        push:
+          sound:
+            name: default
+            critical: 1
+            volume: 1.0
         notification_icon: mdi:alarm-light
         color: red
     action: notify.mobile_app_sm_a346b
