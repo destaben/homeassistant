@@ -231,9 +231,12 @@
 - id: aef7534a6736403faaaf8eb85c0ae137
   alias: home.cleaner
   triggers:
-  - at: '10:30:00'
+  - at: '08:00:00'
     trigger: time
-  conditions: []
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.peak_electricity_hours
+    state: 'off'
   actions:
   - data:
       preset_mode: Auto
@@ -583,4 +586,195 @@
         notification_icon: mdi:alarm-light
         color: red
     action: notify.mobile_app_sm_a346b
+  mode: single
+
+# ── Milestone 1: Data Collection ──────────────────────────────────────────────
+- id: ml_daily_stats_001
+  alias: ml.daily_stats
+  description: "Logs daily summary of key home metrics to the logbook for ML analysis"
+  triggers:
+  - at: '23:55:00'
+    trigger: time
+  conditions: []
+  actions:
+  - action: logbook.log
+    data:
+      name: "Daily Stats"
+      message: >
+        persons_home={{ states('person.destaben') }}/{{ states('person.carolmontaes') }},
+        motion1={{ states('binary_sensor.motion_1_occupancy') }},
+        motion2={{ states('binary_sensor.motion_2_occupancy') }},
+        presence1={{ states('binary_sensor.presence_1_occupancy') }},
+        door={{ states('binary_sensor.door_1_contact') }},
+        heater={{ states('switch.smart_plug_1909121534757325186448e1e903790b_outlet') }},
+        purifier={{ state_attr('fan.zhimi_mc2_8977_air_purifier', 'preset_mode') }}
+      entity_id: "sensor.daily_stats"
+      domain: "sensor"
+  mode: single
+
+# ── Milestone 2: Presence Prediction ──────────────────────────────────────────
+- id: presence_preheat_before_arrival_002
+  alias: presence.preheat_before_arrival
+  description: "Turns on heater 20 minutes before predicted weekday arrival window (18:00)"
+  triggers:
+  - at: '17:40:00'
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: "{{ now().weekday() < 5 }}"
+  - condition: state
+    entity_id: person.destaben
+    state: not_home
+  actions:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.smart_plug_1909121534757325186448e1e903790b_outlet
+  - action: notify.mobile_app_davids_iphone
+    data:
+      title: "🏠 Arrival Expected"
+      message: "Heater turned on. Predicted arrival in ~20 minutes."
+  mode: single
+
+# ── Milestone 3: Energy Optimization ──────────────────────────────────────────
+- id: energy_off_peak_vacuum_003
+  alias: energy.off_peak_vacuum
+  description: "Runs vacuum at 22:00 off-peak if it did not run during the morning off-peak window"
+  triggers:
+  - at: '22:00:00'
+    trigger: time
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.peak_electricity_hours
+    state: 'off'
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: person.destaben
+      state: not_home
+    - condition: state
+      entity_id: person.carolmontaes
+      state: not_home
+  actions:
+  - action: fan.set_preset_mode
+    target:
+      entity_id: fan.zhimi_mc2_8977_air_purifier
+    data:
+      preset_mode: Auto
+  - action: vacuum.start
+    target:
+      entity_id: vacuum.xiaomi_robot_vacuum_x20_sweep_mode
+  mode: single
+
+# ── Milestone 4: Anomaly Detection ────────────────────────────────────────────
+- id: anomaly_no_motion_wellness_check_004
+  alias: anomaly.no_motion_wellness_check
+  description: "Sends a wellness check notification if no motion is detected for 24 hours while someone is home"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.motion_1_occupancy
+    to: 'off'
+    for: "24:00:00"
+  conditions:
+  - condition: state
+    entity_id: person.destaben
+    state: home
+  - condition: state
+    entity_id: binary_sensor.motion_2_occupancy
+    state: 'off'
+  actions:
+  - action: notify.mobile_app_davids_iphone
+    data:
+      title: "🩺 Wellness Check"
+      message: "No motion detected at home for 24 hours. Is everything OK?"
+      data:
+        actions:
+          - action: "OK_IM_FINE"
+            title: "I'm fine"
+          - action: "CALL_ME"
+            title: "Call me"
+  mode: single
+
+- id: anomaly_door_open_at_night_005
+  alias: anomaly.door_open_at_night
+  description: "Alerts if the entry door is still open after 23:00"
+  triggers:
+  - platform: time
+    at: '23:00:00'
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.door_1_contact
+    state: 'on'
+  actions:
+  - action: notify.mobile_app_davids_iphone
+    data:
+      title: "🚪 Security Alert"
+      message: "Entry door is open after 23:00. Please check and close it."
+      data:
+        notification_icon: mdi:door-open
+        color: orange
+  mode: single
+
+- id: anomaly_vacuum_not_run_006
+  alias: anomaly.vacuum_not_run
+  description: "Reminds owner when the vacuum has not completed a cleaning cycle in the last 3 days"
+  triggers:
+  - platform: time
+    at: '09:00:00'
+  conditions:
+  - condition: template
+    value_template: >
+      {{ (now() - states.vacuum.xiaomi_robot_vacuum_x20_sweep_mode.last_changed).total_seconds() > 259200 }}
+  actions:
+  - action: notify.mobile_app_davids_iphone
+    data:
+      title: "🤖 Vacuum Reminder"
+      message: "The robot vacuum has not run in over 3 days. Schedule a cleaning?"
+  mode: single
+
+# ── Milestone 5: Adaptive Lighting ────────────────────────────────────────────
+- id: lighting_adaptive_stationary_007
+  alias: lighting.adaptive_stationary
+  description: "Dims lights when stationary presence is detected for more than 30 minutes (watching TV / reading)"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.presence_1_occupancy
+    to: 'on'
+    for: "00:30:00"
+  conditions:
+  - condition: state
+    entity_id: switch.light
+    state: 'on'
+  - condition: state
+    entity_id: binary_sensor.motion_1_occupancy
+    state: 'off'
+  actions:
+  - action: switch.turn_off
+    target:
+      entity_id:
+      - switch.light_3_mqtt
+      - switch.light_4_mqtt
+      - switch.light_5_mqtt
+  mode: single
+
+- id: lighting_adaptive_active_008
+  alias: lighting.adaptive_active
+  description: "Restores full lighting when frequent movement is detected after stationary mode"
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.motion_2_occupancy
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: switch.light
+    state: 'on'
+  - condition: state
+    entity_id: switch.light_3_mqtt
+    state: 'off'
+  actions:
+  - action: switch.turn_on
+    target:
+      entity_id:
+      - switch.light_3_mqtt
+      - switch.light_4_mqtt
+      - switch.light_5_mqtt
   mode: single
