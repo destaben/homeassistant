@@ -48,9 +48,9 @@ services:
       - ./mosquitto_config:/mosquitto/config/
     networks:
       - homeassistant-net
-      
+
   # Only needed if you want to enable gassistant integration
-  #nginx:
+  # nginx:
   #  container_name: nginx-proxy
   #  image: nginx:latest
   #  restart: unless-stopped
@@ -82,6 +82,30 @@ services:
   #    options:
   #      max-size: "10m"
   #      max-file: "3"
+
+  # ── AI Vision — Milestone 4: local Ollama vision model ───────────────────────
+  # Uncomment to run vision models locally (zero API cost, full privacy).
+  # After starting: docker exec -it ollama ollama pull llava:13b
+  # Then configure the llmvision integration in HA to use provider "Ollama"
+  # with base URL http://ollama:11434 and model llava:13b.
+  #ollama:
+  #  container_name: ollama
+  #  image: ollama/ollama:0.6.5
+  #  restart: unless-stopped
+  #  volumes:
+  #    - ./ollama:/root/.ollama
+  #  ports:
+  #    - "11434:11434"
+  #  networks:
+  #    - homeassistant-net
+  #  # Uncomment the lines below if your host has an NVIDIA GPU:
+  #  # deploy:
+  #  #   resources:
+  #  #     reservations:
+  #  #       devices:
+  #  #         - driver: nvidia
+  #  #           count: all
+  #  #           capabilities: [gpu]
 
 networks:
   homeassistant-net:

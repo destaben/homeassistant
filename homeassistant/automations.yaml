@@ -502,8 +502,11 @@
   mode: single
 - id: '1740090000001'
   alias: alarm.security_alert
-  description: Envía alerta con snapshot de cámara cuando se detecta apertura de
-    puerta o ventana mientras la alarma está activa. Cooldown de 5 minutos entre alertas.
+  description: >
+    Envía alerta con snapshot de cámara cuando se detecta apertura de puerta o
+    ventana mientras la alarma está activa. Cooldown de 5 minutos entre alertas.
+    Milestone 2: LLM Vision verifica que haya una persona en 2 fotogramas
+    consecutivos antes de enviar la notificación crítica al móvil.
   triggers:
   - entity_id: binary_sensor.door_1_contact
     to: 'on'
@@ -524,6 +527,7 @@
   - condition: template
     value_template: "{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds() > 300 }}" # cooldown 5 min
   actions:
+  # 1. Immediate deterrence — play alarm sound at max volume right away
   - action: media_player.volume_set
     target:
       entity_id:
@@ -539,6 +543,7 @@
       entity_id:
       - media_player.dormitorio
       - media_player.despacho
+  # 2. Aim the entrance camera and wait for it to settle
   - target:
       entity_id: select.tapo_camera_2f13_move_to_preset
     data:
@@ -546,41 +551,201 @@
     action: select.select_option
   - delay:
       seconds: 5
+  # 3. Frame 1 — snapshot + LLM Vision analysis
   - variables:
       snapshot_ts: "{{ now().strftime('%Y%m%d_%H%M%S') }}"
+      triggered_sensor: "{{ trigger.to_state.attributes.friendly_name }}"
   - target:
       entity_id: camera.tapo_camera_2f13
     data:
       filename: "/config/www/snapshots/alarm_{{ snapshot_ts }}.jpg"
     action: camera.snapshot
-  - delay:
-      seconds: 2
-  - data:
-      title: "\U0001F6A8 ALARMA ACTIVADA"
-      message: "{{ trigger.to_state.attributes.friendly_name }} activado mientras la alarma está activa"
-      data:
-        attachment:
-          url: "http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts }}.jpg"
-        push:
-          sound:
-            name: default
-            critical: 1
-            volume: 1.0
-        notification_icon: mdi:alarm-light
-        color: red
-    action: notify.mobile_app_davids_iphone
-  - data:
-      title: "\U0001F6A8 ALARMA ACTIVADA"
-      message: "{{ trigger.to_state.attributes.friendly_name }} activado mientras la alarma está activa"
-      data:
-        attachment:
-          url: "http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts }}.jpg"
-        push:
-          sound:
-            name: default
-            critical: 1
-            volume: 1.0
-        notification_icon: mdi:alarm-light
-        color: red
-    action: notify.mobile_app_sm_a346b
+  - action: llmvision.image_analyzer
+    data:
+      provider: !secret llmvision_provider
+      model: !secret llmvision_model
+      message: >
+        Security alert: a door or window has been opened. Analyze this camera
+        image. Respond ONLY with JSON:
+        {"person_detected": true or false, "description": "one sentence"}
+      image_entity:
+        - camera.tapo_camera_2f13_hd_stream
+      max_tokens: 80
+      temperature: 0.1
+    response_variable: vision_frame_1
+  # 4. False-positive reduction — second frame check
+  - if: "{{ 'person_detected\": true' in vision_frame_1.response_text | lower }}"
+    then:
+      - delay:
+          seconds: 5
+      - variables:
+          snapshot_ts2: "{{ now().strftime('%Y%m%d_%H%M%S') }}"
+      - target:
+          entity_id: camera.tapo_camera_2f13
+        data:
+          filename: "/config/www/snapshots/alarm_{{ snapshot_ts2 }}.jpg"
+        action: camera.snapshot
+      - action: llmvision.image_analyzer
+        data:
+          provider: !secret llmvision_provider
+          model: !secret llmvision_model
+          message: >
+            Security confirmation check. Analyze this camera image.
+            Respond ONLY with JSON:
+            {"person_detected": true or false, "description": "one sentence"}
+          image_entity:
+            - camera.tapo_camera_2f13_hd_stream
+          max_tokens: 80
+          temperature: 0.1
+        response_variable: vision_frame_2
+      # 5. Both frames confirmed a person — send critical notification
+      - if: "{{ 'person_detected\": true' in vision_frame_2.response_text | lower }}"
+        then:
+          - action: logbook.log
+            data:
+              name: "[AI_AGENT] Alarm — person confirmed"
+              message: >
+                Person confirmed in 2 consecutive frames.
+                Frame 1: {{ vision_frame_1.response_text[:150] }}
+                Frame 2: {{ vision_frame_2.response_text[:150] }}
+              entity_id: input_text.vision_last_analysis
+          - data:
+              title: "\U0001F6A8 ALARMA ACTIVADA"
+              message: >
+                {{ triggered_sensor }} abierto. Persona detectada.
+                {{ vision_frame_2.response_text[:150] }}
+              data:
+                attachment:
+                  url: "http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts2 }}.jpg"
+                push:
+                  sound:
+                    name: default
+                  critical: 1
+                  volume: 1.0
+                notification_icon: mdi:alarm-light
+                color: red
+            action: notify.mobile_app_davids_iphone
+          - data:
+              title: "\U0001F6A8 ALARMA ACTIVADA"
+              message: >
+                {{ triggered_sensor }} abierto. Persona detectada.
+                {{ vision_frame_2.response_text[:150] }}
+              data:
+                attachment:
+                  url: "http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts2 }}.jpg"
+                push:
+                  sound:
+                    name: default
+                  critical: 1
+                  volume: 1.0
+                notification_icon: mdi:alarm-light
+                color: red
+            action: notify.mobile_app_sm_a346b
+        else:
+          # Frame 2 — no person: log as false positive, skip critical notification
+          - action: logbook.log
+            data:
+              name: "[AI_AGENT] Alarm — false positive (frame 2)"
+              message: >
+                Frame 1 detected a person but frame 2 did not.
+                Skipping critical notification.
+                Frame 1: {{ vision_frame_1.response_text[:150] }}
+                Frame 2: {{ vision_frame_2.response_text[:150] }}
+              entity_id: input_text.vision_last_analysis
+    else:
+      # Frame 1 — no person: log as false positive, skip critical notification
+      - action: logbook.log
+        data:
+          name: "[AI_AGENT] Alarm — false positive (frame 1)"
+          message: >
+            Sensor triggered but no person detected by LLM Vision.
+            Skipping critical notification.
+            Analysis: {{ vision_frame_1.response_text[:200] }}
+          entity_id: input_text.vision_last_analysis
+  mode: single
+
+# ── AI Vision — Milestone 1: periodic baseline analysis ──────────────────────
+- id: '1740090000002'
+  alias: vision.periodic_analysis
+  description: >
+    Runs the entrance camera LLM Vision analysis every 10 minutes and stores
+    the structured JSON result in input_text.vision_last_analysis.
+  triggers:
+  - trigger: time_pattern
+    minutes: "/10"
+  conditions: []
+  actions:
+  - action: script.analyze_camera
+  mode: single
+
+# ── AI Vision — Milestone 3: package detection ───────────────────────────────
+- id: '1740090000003'
+  alias: vision.package_detection
+  description: >
+    After the door closes (delivery scenario) or every 30 minutes during
+    daytime, checks whether a package is visible at the entrance and updates
+    input_boolean.package_at_door accordingly.
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.door_1_contact
+    to: 'off'
+    for:
+      seconds: 30
+  - trigger: time_pattern
+    minutes: "/30"
+  conditions:
+  - condition: time
+    after: '08:00:00'
+    before: '21:00:00'
+  actions:
+  - action: llmvision.image_analyzer
+    data:
+      provider: !secret llmvision_provider
+      model: !secret llmvision_model
+      message: >
+        Look at this entrance camera image. Is there a package, parcel, or
+        delivery box visible on the floor or doorstep?
+        Respond ONLY with JSON:
+        {"package_detected": true or false, "description": "one sentence"}
+      image_entity:
+        - camera.tapo_camera_2f13_hd_stream
+      max_tokens: 80
+      temperature: 0.1
+    response_variable: pkg_analysis
+  - if: "{{ 'package_detected\": true' in pkg_analysis.response_text | lower }}"
+    then:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.package_at_door
+      - action: logbook.log
+        data:
+          name: "[AI_AGENT] Package Detection"
+          message: >
+            Package detected at entrance.
+            {{ pkg_analysis.response_text[:200] }}
+          entity_id: input_boolean.package_at_door
+    else:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.package_at_door
+  mode: single
+
+# ── AI Vision — Milestone 3: daily visitor summary ───────────────────────────
+- id: '1740090000004'
+  alias: vision.daily_summary
+  description: >
+    Every evening sends a summary notification with the last known camera
+    analysis and current package-at-door status.
+  triggers:
+  - trigger: time
+    at: '20:00:00'
+  conditions: []
+  actions:
+  - action: notify.mobile_app_davids_iphone
+    data:
+      title: "\U0001F441 Resumen de visión diaria"
+      message: >
+        Última análisis de cámara:
+        {{ states('input_text.vision_last_analysis')[:200] }}
+        Paquete en puerta: {{ 'Sí' if is_state('input_boolean.package_at_door', 'on') else 'No' }}
   mode: single
