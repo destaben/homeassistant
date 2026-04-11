@@ -16,14 +16,14 @@ Self-hosted smart home infrastructure based on Home Assistant, Zigbee2MQTT, and 
 
 - All output (code, YAML, comments, issue descriptions, PR titles) must be written in **English**
 - Never generate, guess, or hallucinate entity IDs, service names, or device names — always derive them from existing config files
-- Before suggesting new automations, read `homeassistant/automations.yaml` to understand existing patterns and avoid duplicates
+- Before suggesting new automations, read `ha/automations.yaml` to understand existing patterns and avoid duplicates
 - This is a production system. Changes to `automations.yaml`, `configuration.yaml`, or `docker-compose.yaml` affect a live home — be conservative
 
 ### Security (Non-Negotiable)
 
 - **Never** write secrets, API keys, tokens, or passwords to any tracked file
 - **Never** suggest removing `!secret` references in favour of inline values
-- **Never** modify `.gitignore` in ways that could expose `secrets.yaml`, `.env`, or `data/`
+- **Never** modify `.gitignore` in ways that could expose `ha/secrets.yaml`, `.env`, or `zigbee2mqtt/`
 - When reviewing code, always flag: hardcoded credentials, `allow_anonymous true` in MQTT, unencrypted HTTP endpoints, `privileged: true` containers
 - If asked to generate a `secrets.yaml.example`, use placeholder values only — never real values
 
@@ -43,7 +43,7 @@ Self-hosted smart home infrastructure based on Home Assistant, Zigbee2MQTT, and 
 
 ### AI / LLM Features
 
-- When working on AI/agent features, check `homeassistant/configuration.yaml` for `assist_pipeline:` and `homeassistant/www/llmvision/` for existing LLM Vision state
+- When working on AI/agent features, check `ha/configuration.yaml` for `assist_pipeline:` and `ha/www/llmvision/` for existing LLM Vision state
 - Prefer local-first AI (Ollama) over cloud APIs when writing initial implementations
 - All AI-initiated HA service calls must be logged to the HA logbook with tag `[AI_AGENT]`
 - Enforce rate limits on agentic loops (max 10 service calls per agent execution)
@@ -55,16 +55,16 @@ Self-hosted smart home infrastructure based on Home Assistant, Zigbee2MQTT, and 
 
 | File | Purpose | When to read |
 |---|---|---|
-| `homeassistant/configuration.yaml` | Main HA config | Any HA config task |
-| `homeassistant/automations.yaml` | All automations | Adding/editing automations |
-| `homeassistant/scripts.yaml` | Reusable scripts | Adding new scripts |
-| `homeassistant/ui-lovelace.yaml` | Dashboard layout | UI/dashboard tasks |
-| `homeassistant/secrets.yaml.example` | Secret key reference | When configuring integrations |
+| `ha/configuration.yaml` | Main HA config | Any HA config task |
+| `ha/automations.yaml` | All automations | Adding/editing automations |
+| `ha/scripts.yaml` | Reusable scripts | Adding new scripts |
+| `ha/ui-lovelace.yaml` | Dashboard layout | UI/dashboard tasks |
+| `ha/secrets.yaml.example` | Secret key reference | When configuring integrations |
 | `docker-compose.yaml` | Service definitions | Infrastructure tasks |
-| `nginx.conf` | Reverse proxy config | External access / OAuth tasks |
+| `nginx/nginx.conf` | Reverse proxy config | External access / OAuth tasks |
 | `cloudflared/config.yml` | Tunnel config | External access tasks |
-| `data/configuration.yaml` | Zigbee2MQTT config + device list | ZigBee device tasks |
-| `mosquitto_config/mosquitto.conf` | MQTT broker config | MQTT security tasks |
+| `zigbee2mqtt/configuration.yaml` | Zigbee2MQTT config + device list | ZigBee device tasks |
+| `mosquitto/config/mosquitto.conf` | MQTT broker config | MQTT security tasks |
 
 ---
 
@@ -179,4 +179,4 @@ Q4 2026 — Advanced Agents
 2. **One change at a time** — make focused, reviewable changes; avoid changing unrelated files
 3. **Test instructions** — include in every PR/suggestion how to validate the change in HA
 4. **Reference issues** — link to the relevant GitHub issue when making a change that addresses one
-5. **Secrets stay secret** — if a new secret key is needed, add it to `secrets.yaml.example` as a placeholder and reference it with `!secret` in config
+5. **Secrets stay secret** — if a new secret key is needed, add it to `ha/secrets.yaml.example` as a placeholder and reference it with `!secret` in config
