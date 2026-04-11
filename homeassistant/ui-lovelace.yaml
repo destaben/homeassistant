@@ -272,3 +272,105 @@ views:
         name: Alarma
         tap_action:
           action: toggle
+
+  - type: sections
+    path: meshtastic
+    title: Meshtastic
+    icon: mdi:radio-tower
+    max_columns: 2
+    sections:
+      - type: grid
+        title: "Nodo: d3st"
+        cards:
+          - type: gauge
+            entity: sensor.meshtastic_d3st_bateria
+            name: "Batería d3st"
+            min: 0
+            max: 100
+            unit: "%"
+            severity:
+              green: 60
+              yellow: 30
+              red: 0
+            needle: true
+
+          - type: entities
+            title: "d3st — Telemetría"
+            entities:
+              - entity: sensor.meshtastic_d3st_bateria
+                name: Batería
+                icon: mdi:battery
+              - entity: sensor.meshtastic_d3st_voltaje
+                name: Voltaje
+                icon: mdi:flash
+              - entity: sensor.meshtastic_d3st_snr
+                name: SNR
+                icon: mdi:signal
+              - entity: sensor.meshtastic_d3st_rssi
+                name: RSSI
+                icon: mdi:wifi-strength-2
+
+          - type: entities
+            title: "d3st — Posición GPS"
+            entities:
+              - entity: sensor.meshtastic_d3st_latitud
+                name: Latitud
+                icon: mdi:latitude
+              - entity: sensor.meshtastic_d3st_longitud
+                name: Longitud
+                icon: mdi:longitude
+
+          - type: map
+            title: "d3st — Mapa"
+            entities:
+              - entity: device_tracker.meshtastic_d3st
+            hours_to_show: 24
+            default_zoom: 12
+
+      - type: grid
+        title: "Nodo: Layana"
+        cards:
+          - type: gauge
+            entity: sensor.meshtastic_layana_bateria
+            name: "Batería Layana"
+            min: 0
+            max: 100
+            unit: "%"
+            severity:
+              green: 60
+              yellow: 30
+              red: 0
+            needle: true
+
+          - type: entities
+            title: "Layana — Telemetría"
+            entities:
+              - entity: sensor.meshtastic_layana_bateria
+                name: Batería
+                icon: mdi:battery
+              - entity: sensor.meshtastic_layana_voltaje
+                name: Voltaje
+                icon: mdi:flash
+              - entity: sensor.meshtastic_layana_snr
+                name: SNR
+                icon: mdi:signal
+              - entity: sensor.meshtastic_layana_rssi
+                name: RSSI
+                icon: mdi:wifi-strength-2
+
+          - type: entities
+            title: "Layana — Posición GPS"
+            entities:
+              - entity: sensor.meshtastic_layana_latitud
+                name: Latitud
+                icon: mdi:latitude
+              - entity: sensor.meshtastic_layana_longitud
+                name: Longitud
+                icon: mdi:longitude
+
+          - type: map
+            title: "Layana — Mapa"
+            entities:
+              - entity: device_tracker.meshtastic_layana
+            hours_to_show: 24
+            default_zoom: 12

@@ -106,3 +106,199 @@ mqtt:
       value_template: "{{ value_json.state }}"
       qos: 1
       retain: true
+
+  sensor:
+    # ─── Nodo Meshtastic: d3st ─────────────────────────────────────────────────
+    - name: "Meshtastic d3st Batería"
+      unique_id: "meshtastic_d3st_battery"
+      state_topic: !secret meshtastic_d3st_topic
+      value_template: >-
+        {% if value_json.type == 'telemetry' and value_json.payload.battery_level is defined %}
+          {{ value_json.payload.battery_level }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic d3st Voltaje"
+      unique_id: "meshtastic_d3st_voltage"
+      state_topic: !secret meshtastic_d3st_topic
+      value_template: >-
+        {% if value_json.type == 'telemetry' and value_json.payload.voltage is defined %}
+          {{ value_json.payload.voltage | round(2) }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "V"
+      device_class: voltage
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic d3st SNR"
+      unique_id: "meshtastic_d3st_snr"
+      state_topic: !secret meshtastic_d3st_topic
+      value_template: >-
+        {% if value_json.rx_snr is defined %}
+          {{ value_json.rx_snr }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "dB"
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic d3st RSSI"
+      unique_id: "meshtastic_d3st_rssi"
+      state_topic: !secret meshtastic_d3st_topic
+      value_template: >-
+        {% if value_json.rx_rssi is defined %}
+          {{ value_json.rx_rssi }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "dBm"
+      device_class: signal_strength
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic d3st Latitud"
+      unique_id: "meshtastic_d3st_latitude"
+      state_topic: !secret meshtastic_d3st_topic
+      value_template: >-
+        {% if value_json.type == 'position' and value_json.payload.latitude_i is defined %}
+          {{ (value_json.payload.latitude_i / 1e7) | round(6) }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "°"
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic d3st Longitud"
+      unique_id: "meshtastic_d3st_longitude"
+      state_topic: !secret meshtastic_d3st_topic
+      value_template: >-
+        {% if value_json.type == 'position' and value_json.payload.longitude_i is defined %}
+          {{ (value_json.payload.longitude_i / 1e7) | round(6) }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "°"
+      state_class: measurement
+      expire_after: 86400
+
+    # ─── Nodo Meshtastic: Layana ───────────────────────────────────────────────
+    - name: "Meshtastic Layana Batería"
+      unique_id: "meshtastic_layana_battery"
+      state_topic: !secret meshtastic_layana_topic
+      value_template: >-
+        {% if value_json.type == 'telemetry' and value_json.payload.battery_level is defined %}
+          {{ value_json.payload.battery_level }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic Layana Voltaje"
+      unique_id: "meshtastic_layana_voltage"
+      state_topic: !secret meshtastic_layana_topic
+      value_template: >-
+        {% if value_json.type == 'telemetry' and value_json.payload.voltage is defined %}
+          {{ value_json.payload.voltage | round(2) }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "V"
+      device_class: voltage
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic Layana SNR"
+      unique_id: "meshtastic_layana_snr"
+      state_topic: !secret meshtastic_layana_topic
+      value_template: >-
+        {% if value_json.rx_snr is defined %}
+          {{ value_json.rx_snr }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "dB"
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic Layana RSSI"
+      unique_id: "meshtastic_layana_rssi"
+      state_topic: !secret meshtastic_layana_topic
+      value_template: >-
+        {% if value_json.rx_rssi is defined %}
+          {{ value_json.rx_rssi }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "dBm"
+      device_class: signal_strength
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic Layana Latitud"
+      unique_id: "meshtastic_layana_latitude"
+      state_topic: !secret meshtastic_layana_topic
+      value_template: >-
+        {% if value_json.type == 'position' and value_json.payload.latitude_i is defined %}
+          {{ (value_json.payload.latitude_i / 1e7) | round(6) }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "°"
+      state_class: measurement
+      expire_after: 86400
+
+    - name: "Meshtastic Layana Longitud"
+      unique_id: "meshtastic_layana_longitude"
+      state_topic: !secret meshtastic_layana_topic
+      value_template: >-
+        {% if value_json.type == 'position' and value_json.payload.longitude_i is defined %}
+          {{ (value_json.payload.longitude_i / 1e7) | round(6) }}
+        {% else %}
+          {{ this.state }}
+        {% endif %}
+      unit_of_measurement: "°"
+      state_class: measurement
+      expire_after: 86400
+
+  device_tracker:
+    - name: "Meshtastic d3st"
+      unique_id: "meshtastic_d3st_tracker"
+      state_topic: !secret meshtastic_d3st_topic
+      json_attributes_topic: !secret meshtastic_d3st_topic
+      json_attributes_template: >-
+        {% if value_json.type == 'position' and value_json.payload.latitude_i is defined %}
+          {{ {"latitude": (value_json.payload.latitude_i / 1e7) | round(6),
+              "longitude": (value_json.payload.longitude_i / 1e7) | round(6),
+              "gps_accuracy": 10,
+              "altitude": value_json.payload.altitude | default(0)} | tojson }}
+        {% else %}
+          {{ this.attributes | tojson }}
+        {% endif %}
+      source_type: gps
+
+    - name: "Meshtastic Layana"
+      unique_id: "meshtastic_layana_tracker"
+      state_topic: !secret meshtastic_layana_topic
+      json_attributes_topic: !secret meshtastic_layana_topic
+      json_attributes_template: >-
+        {% if value_json.type == 'position' and value_json.payload.latitude_i is defined %}
+          {{ {"latitude": (value_json.payload.latitude_i / 1e7) | round(6),
+              "longitude": (value_json.payload.longitude_i / 1e7) | round(6),
+              "gps_accuracy": 10,
+              "altitude": value_json.payload.altitude | default(0)} | tojson }}
+        {% else %}
+          {{ this.attributes | tojson }}
+        {% endif %}
+      source_type: gps
