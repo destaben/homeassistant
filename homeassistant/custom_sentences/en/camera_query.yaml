@@ -1,0 +1,10 @@
+language: "en"
+intents:
+  QueryCamera:
+    data:
+      - sentences:
+          - "what do you see [at the door|in the living room|outside]"
+          - "is anyone [home|at the door|in the hallway]"
+          - "show me the camera"
+          - "check the entrance"
+          - "who is at the door"
