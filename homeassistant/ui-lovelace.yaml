@@ -93,7 +93,6 @@ views:
                         width: 50%;
                       }
 
-
           - type: vertical-stack
             cards:
               - type: horizontal-stack

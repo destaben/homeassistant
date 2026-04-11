@@ -197,4 +197,3 @@ mqtt:
       value_template: "{{ value_json.state }}"
       qos: 1
       retain: true
-
