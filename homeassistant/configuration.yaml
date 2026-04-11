@@ -34,6 +34,26 @@ history:
 
 assist_pipeline:
 
+# AI helpers — store last LLM response and toggle proactive notifications
+input_text:
+  ai_last_response:
+    name: "AI Last Response"
+    max: 255
+
+input_boolean:
+  ai_notifications_enabled:
+    name: "AI Proactive Notifications"
+    icon: mdi:robot
+
+# Custom intent handler: wire the QueryCamera Assist intent to the analyze script.
+# The matching sentences are defined in custom_sentences/en/camera_query.yaml.
+intent_script:
+  QueryCamera:
+    speech:
+      text: "{{ states('input_text.ai_last_response') }}"
+    action:
+      - action: script.analyze_camera
+
 http:
   use_x_forwarded_for: true
   trusted_proxies:

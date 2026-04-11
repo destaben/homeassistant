@@ -584,3 +584,40 @@
         color: red
     action: notify.mobile_app_sm_a346b
   mode: single
+
+# ── Milestone 3: Proactive AI Notifications ───────────────────────────────────
+- id: "1740090000003"
+  alias: ai.daily_briefing
+  description: >-
+    Daily AI briefing at 08:00: queries the configured conversation agent for a
+    home-status summary and sends it as a mobile notification.
+    The default agent_id 'homeassistant' uses HA's built-in assistant and works
+    immediately. Once Ollama or OpenAI is configured via
+    Settings → Voice Assistants → Add Assistant, replace 'homeassistant' with
+    the slug shown on that page (e.g. conversation.ollama_mistral_7b).
+  triggers:
+    - trigger: time
+      at: "08:00:00"
+  conditions:
+    - condition: state
+      entity_id: input_boolean.ai_notifications_enabled
+      state: "on"
+  actions:
+    - action: conversation.process
+      data:
+        text: >-
+          Summarize the current home status: temperature, humidity, who is home,
+          which lights or plugs are on, and any active alerts.
+          Keep the summary under 200 words.
+        agent_id: homeassistant
+      response_variable: ai_response
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.ai_last_response
+      data:
+        value: "{{ ai_response.response.speech.plain.speech[:255] }}" # matches input_text.ai_last_response max
+    - action: notify.mobile_app_davids_iphone
+      data:
+        title: "\U0001F916 AI Briefing"
+        message: "{{ ai_response.response.speech.plain.speech }}"
+  mode: single

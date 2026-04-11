@@ -358,3 +358,42 @@ views:
                 name: RX/min
               - entity: sensor.d3st_tasa_tx
                 name: TX/min
+
+  # ── Milestone 5: AI Assistant Dashboard ──────────────────────────────────────
+  - title: AI Assistant
+    path: ai-assistant
+    icon: mdi:robot
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        title: Conversational AI
+        column_span: 1
+        cards:
+          # Toggle proactive notifications + display last AI response
+          - type: entities
+            title: AI Status
+            entities:
+              - entity: input_boolean.ai_notifications_enabled
+                name: "Proactive Notifications"
+              - entity: input_text.ai_last_response
+                name: "Last Response"
+
+          # Trigger the daily briefing on demand
+          - type: button
+            name: "Request AI Briefing"
+            icon: mdi:robot-excited
+            tap_action:
+              action: perform-action
+              perform_action: automation.trigger
+              target:
+                entity_id: automation.ai_daily_briefing
+
+          # Trigger camera analysis on demand
+          - type: button
+            name: "Analyze Entrance Camera"
+            icon: mdi:camera-iris
+            tap_action:
+              action: perform-action
+              perform_action: script.analyze_camera
+              target: {}

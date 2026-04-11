@@ -14,3 +14,36 @@ move_camera_salon:
       entity_id: select.tapo_camera_2f13_move_to_preset
     data:
       option: Salon
+
+# Milestone 4 — AI Vision: move camera to entrance, take a snapshot, and store
+# the result so the QueryCamera Assist intent can reference it.
+# Once the llmvision integration is configured, replace the final step with the
+# appropriate llmvision service call (e.g. llmvision.image_analyzer).
+analyze_camera:
+  alias: "Analyze camera with AI"
+  description: >-
+    Moves the entrance camera to the Entrada preset, captures a snapshot to
+    /config/www/llmvision/, and updates input_text.ai_last_response with the
+    image path so the Assist QueryCamera intent can respond.
+  sequence:
+    - variables:
+        snapshot_ts: "{{ now().strftime('%Y%m%d_%H%M%S') }}"
+    - action: select.select_option
+      target:
+        entity_id: select.tapo_camera_2f13_move_to_preset
+      data:
+        option: Entrada
+    - delay:
+        seconds: 2
+    - action: camera.snapshot
+      target:
+        entity_id: camera.tapo_camera_2f13
+      data:
+        filename: "/config/www/llmvision/camera_query_{{ snapshot_ts }}.jpg"
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.ai_last_response
+      data:
+        value: >-
+          Snapshot captured at {{ now().strftime('%H:%M') }}.
+          View at /local/llmvision/camera_query_{{ snapshot_ts }}.jpg

@@ -48,7 +48,24 @@ services:
       - ./mosquitto_config:/mosquitto/config/
     networks:
       - homeassistant-net
-      
+
+  # Milestone 1 (Option B) — Local LLM backend.
+  # After starting: docker exec -it ollama ollama pull mistral:7b
+  # Then configure the Ollama integration in HA:
+  #   Settings → Devices & Services → Add Integration → Ollama
+  #   URL: http://ollama:11434   Model: mistral:7b
+  # Set the resulting agent as the default in Settings → Voice Assistants.
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:0.6.2
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - homeassistant-net
+
   # Only needed if you want to enable gassistant integration
   #nginx:
   #  container_name: nginx-proxy
@@ -89,3 +106,6 @@ networks:
     ipam:
       config:
         - subnet: 172.22.0.0/24
+
+volumes:
+  ollama_data:
