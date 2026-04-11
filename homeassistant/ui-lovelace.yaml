@@ -359,4 +359,3 @@ views:
                 name: RX/min
               - entity: sensor.d3st_tasa_tx
                 name: TX/min
-
