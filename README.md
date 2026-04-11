@@ -63,6 +63,33 @@ cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
 # Edit secrets.yaml — add all credentials
 ```
 
+### 2a. Create MQTT password file
+
+The Mosquitto broker requires a password file at `./etc_mosquitto/passwd` (mapped to
+`/etc/mosquitto/passwd` inside the container).  Run these commands **after** the
+containers have started at least once (so the image is available), or run them
+independently against the Mosquitto image:
+
+```bash
+mkdir -p etc_mosquitto
+
+# Create the password file with the homeassistant user (-c creates a new file)
+docker run --rm -v "$(pwd)/etc_mosquitto:/etc/mosquitto" \
+  eclipse-mosquitto:2.0 \
+  mosquitto_passwd -c -b /etc/mosquitto/passwd homeassistant YOUR_HA_MQTT_PASSWORD
+
+# Add the zigbee2mqtt user
+docker run --rm -v "$(pwd)/etc_mosquitto:/etc/mosquitto" \
+  eclipse-mosquitto:2.0 \
+  mosquitto_passwd -b /etc/mosquitto/passwd zigbee2mqtt YOUR_Z2M_MQTT_PASSWORD
+```
+
+Set the same passwords in `homeassistant/secrets.yaml` (`mqtt_password`) and in
+`data/configuration.yaml` under the `mqtt.password` key for Zigbee2MQTT.
+
+> ⚠️ `data/configuration.yaml` is gitignored because it also contains the Zigbee
+> network key — edit it carefully and keep it in a secure offline backup.
+
 ### 3. Restore Zigbee2MQTT config
 
 `data/` is gitignored because it contains the Zigbee network key. You need to either:
@@ -129,7 +156,7 @@ See [GitHub Issues](https://github.com/destaben/homeassistant/issues) for the fu
 | # | Title | Priority |
 |---|---|---|
 | [#1](https://github.com/destaben/homeassistant/issues/1) | Zigbee network key in plaintext | 🔴 Critical |
-| [#2](https://github.com/destaben/homeassistant/issues/2) | MQTT anonymous access | 🔴 High |
+| [#2](https://github.com/destaben/homeassistant/issues/2) | MQTT anonymous access | ✅ Fixed |
 | [#3](https://github.com/destaben/homeassistant/issues/3) | nginx /auth/token blocks POST | 🟠 High |
 | [#7](https://github.com/destaben/homeassistant/issues/7) | Replace manual MQTT lights with auto-discovery | 🟡 Medium |
 | [#14](https://github.com/destaben/homeassistant/issues/14) | AI Vision epic | 🤖 Epic |
@@ -140,7 +167,7 @@ See [GitHub Issues](https://github.com/destaben/homeassistant/issues) for the fu
 
 - `secrets.yaml`, `.env`, `data/`, `etc_mosquitto/` are gitignored — never force-add them
 - All credentials must use `!secret` references — never inline values
-- MQTT currently allows anonymous connections ([#2](https://github.com/destaben/homeassistant/issues/2)) — fix before exposing externally
+- MQTT anonymous access is disabled; create `etc_mosquitto/passwd` as described above before starting the broker
 - HA container runs `privileged: true` ([#9](https://github.com/destaben/homeassistant/issues/9)) — reduce when integration compatibility allows
 
 ## Updating
