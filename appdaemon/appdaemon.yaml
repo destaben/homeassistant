@@ -1,0 +1,26 @@
+appdaemon:
+  latitude: !secret latitude
+  longitude: !secret longitude
+  elevation: !secret elevation
+  time_zone: Europe/Madrid
+  missing_app_warnings: 1
+  plugins:
+    HASS:
+      type: hass
+      ha_url: !secret ha_url
+      token: !secret appdaemon_token
+
+http:
+  url: http://0.0.0.0:5050
+
+logs:
+  main_log:
+    filename: /conf/logs/appdaemon.log
+    log_generations: 3
+    log_size: 1000000
+  error_log:
+    filename: /conf/logs/error.log
+    log_generations: 3
+    log_size: 1000000
+  access_log:
+    filename: /conf/logs/access.log
