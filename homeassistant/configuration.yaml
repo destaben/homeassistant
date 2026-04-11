@@ -44,6 +44,21 @@ http:
   ip_ban_enabled: true
   login_attempts_threshold: 3
 
+group:
+  all_persons:
+    name: "All Persons"
+    entities:
+      - person.destaben
+      - person.carolmontaes
+
+input_boolean:
+  home_occupied:
+    name: "Home Occupied"
+    icon: mdi:home-account
+  vacation_mode:
+    name: "Vacation Mode"
+    icon: mdi:airplane
+
 automation: !include automations.yaml
 script: !include scripts.yaml
 
