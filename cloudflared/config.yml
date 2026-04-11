@@ -1,6 +1,0 @@
-tunnel: homeassistant-google
-
-ingress:
-  - hostname: hassistant.destaben.dev
-    service: http://localhost:8081
-  - service: http_status:404
