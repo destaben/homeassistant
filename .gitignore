@@ -29,6 +29,7 @@ etc_mosquitto/
 
 # Secrets and credentials
 homeassistant/secrets.yaml
+appdaemon/secrets.yaml
 .env
 .env.local
 

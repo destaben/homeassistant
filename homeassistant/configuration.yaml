@@ -47,6 +47,11 @@ http:
 automation: !include automations.yaml
 script: !include scripts.yaml
 
+input_boolean:
+  agent_dry_run:
+    name: "AI Agent Dry Run"
+    icon: mdi:robot-outline
+
 sensor:
   # Derivadas de contadores Meshtastic d3st — tasa de cambio (anomalías)
   - platform: derivative
