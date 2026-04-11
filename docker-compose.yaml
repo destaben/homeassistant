@@ -10,7 +10,9 @@ services:
       - /dev/ttyUSB0:/dev/ttyUSB0
     cap_add:
       - NET_ADMIN
+      - NET_RAW
     security_opt:
+      - apparmor:unconfined
       - no-new-privileges:true
     ports:
       - "8123:8123"
