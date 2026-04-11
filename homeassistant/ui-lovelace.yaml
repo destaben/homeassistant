@@ -1,7 +1,9 @@
 title: Home
 views:
   - type: sections
+    title: Casa
     path: sections
+    icon: mdi:home
     max_columns: 3
     sections:
       - type: grid
@@ -272,105 +274,89 @@ views:
         name: Alarma
         tap_action:
           action: toggle
-
-  - type: sections
+  - title: Meshtastic d3st
     path: meshtastic
-    title: Meshtastic
-    icon: mdi:radio-tower
+    icon: mdi:radio-handheld
+    type: sections
     max_columns: 2
     sections:
+      # ── Node status + channel (3-card row) ───────────────────────────────────
       - type: grid
-        title: "Nodo: d3st"
+        title: Node d3st
+        column_span: 2
+        columns: 4
         cards:
-          - type: gauge
-            entity: sensor.meshtastic_d3st_bateria
-            name: "Batería d3st"
-            min: 0
-            max: 100
-            unit: "%"
-            severity:
-              green: 60
-              yellow: 30
-              red: 0
-            needle: true
+          - type: tile
+            entity: meshtastic.gateway_d3st
+            name: Gateway d3st
 
-          - type: entities
-            title: "d3st — Telemetría"
-            entities:
-              - entity: sensor.meshtastic_d3st_bateria
-                name: Batería
-                icon: mdi:battery
-              - entity: sensor.meshtastic_d3st_voltaje
-                name: Voltaje
-                icon: mdi:flash
-              - entity: sensor.meshtastic_d3st_snr
-                name: SNR
-                icon: mdi:signal
-              - entity: sensor.meshtastic_d3st_rssi
-                name: RSSI
-                icon: mdi:wifi-strength-2
+          - type: tile
+            entity: sensor.d3st_canal_media_1h
+            name: Channel (1h avg)
 
-          - type: entities
-            title: "d3st — Posición GPS"
-            entities:
-              - entity: sensor.meshtastic_d3st_latitud
-                name: Latitud
-                icon: mdi:latitude
-              - entity: sensor.meshtastic_d3st_longitud
-                name: Longitud
-                icon: mdi:longitude
+          - type: tile
+            entity: sensor.d3st_airtime_media_1h
+            name: Airtime (1h avg)
 
-          - type: map
-            title: "d3st — Mapa"
-            entities:
-              - entity: device_tracker.meshtastic_d3st
-            hours_to_show: 24
-            default_zoom: 12
+          - type: tile
+            entity: sensor.d3st_nodes_online_media_1h
+            name: Nodes online (1h avg)
 
+      # ── Online nodes ──────────────────────────────────────────────────────────
       - type: grid
-        title: "Nodo: Layana"
+        title: Network nodes
+        columns: 2
+        column_span: 2
         cards:
-          - type: gauge
-            entity: sensor.meshtastic_layana_bateria
-            name: "Batería Layana"
-            min: 0
-            max: 100
-            unit: "%"
-            severity:
-              green: 60
-              yellow: 30
-              red: 0
-            needle: true
-
-          - type: entities
-            title: "Layana — Telemetría"
+          - type: history-graph
+            title: Online nodes
+            hours_to_show: 360
             entities:
-              - entity: sensor.meshtastic_layana_bateria
-                name: Batería
-                icon: mdi:battery
-              - entity: sensor.meshtastic_layana_voltaje
-                name: Voltaje
-                icon: mdi:flash
-              - entity: sensor.meshtastic_layana_snr
-                name: SNR
-                icon: mdi:signal
-              - entity: sensor.meshtastic_layana_rssi
-                name: RSSI
-                icon: mdi:wifi-strength-2
+              - entity: sensor.meshtastic_d3st_2661074868_stats_nodes_online
+                name: Online
 
-          - type: entities
-            title: "Layana — Posición GPS"
+          - type: statistics-graph
+            title: Channel
+            days_to_show: 15
+            period: day
+            stat_types:
+              - mean
             entities:
-              - entity: sensor.meshtastic_layana_latitud
-                name: Latitud
-                icon: mdi:latitude
-              - entity: sensor.meshtastic_layana_longitud
-                name: Longitud
-                icon: mdi:longitude
+              - entity: sensor.meshtastic_d3st_2661074868_device_channel_utilization
+                name: Channel utilization
+              - entity: sensor.meshtastic_d3st_2661074868_device_airtime
+                name: Airtime TX
 
-          - type: map
-            title: "Layana — Mapa"
+      # ── Traffic — anomaly detection (rate of change, 5 min window) ───────────
+      - type: grid
+        title: Packet traffic
+        columns: 2
+        column_span: 2
+        cards:
+
+          - type: statistics-graph
+            title: Anomalies — daily max
+            days_to_show: 15
+            period: day
+            stat_types:
+              - max
             entities:
-              - entity: device_tracker.meshtastic_layana
-            hours_to_show: 24
-            default_zoom: 12
+              - entity: sensor.d3st_tasa_errores_rf
+                name: RF errors/min
+              - entity: sensor.d3st_tasa_duplicados
+                name: Duplicates/min
+              - entity: sensor.d3st_tasa_relay_cancelado
+                name: Relay cancel./min
+
+          - type: statistics-graph
+            title: Traffic flow — daily mean
+            days_to_show: 15
+            period: day
+            stat_types:
+              - mean
+            entities:
+              - entity: sensor.d3st_tasa_rx
+                name: RX/min
+              - entity: sensor.d3st_tasa_tx
+                name: TX/min
+
