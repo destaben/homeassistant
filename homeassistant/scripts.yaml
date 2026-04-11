@@ -14,3 +14,43 @@ move_camera_salon:
       entity_id: select.tapo_camera_2f13_move_to_preset
     data:
       option: Salon
+
+# ── AI Vision — Milestone 1: baseline camera analysis ────────────────────────
+analyze_camera:
+  alias: "AI Vision — Analyze entrance camera"
+  description: >
+    Captures a live frame from the entrance camera and asks the LLM to
+    describe the scene in structured JSON. The result is stored in
+    input_text.vision_last_analysis for template sensors and automations.
+    Provider and model are read from secrets.yaml (llmvision_provider /
+    llmvision_model).
+  icon: mdi:eye-outline
+  mode: single
+  sequence:
+    - action: llmvision.image_analyzer
+      data:
+        provider: !secret llmvision_provider
+        model: !secret llmvision_model
+        message: >
+          Analyze this camera image. Respond ONLY with the following JSON and
+          nothing else:
+          {"person_detected": true or false, "door_state": "open" or "closed"
+          or "unknown", "anomaly": true or false,
+          "summary": "one sentence description"}
+        image_entity:
+          - camera.tapo_camera_2f13_hd_stream
+        max_tokens: 100
+        temperature: 0.1
+      response_variable: vision_response
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.vision_last_analysis
+      data:
+        value: "{{ vision_response.response_text[:255] }}"
+    - action: logbook.log
+      data:
+        name: "[AI_AGENT] Vision Analysis"
+        message: >
+          Entrance camera analyzed.
+          Result: {{ vision_response.response_text[:200] }}
+        entity_id: input_text.vision_last_analysis

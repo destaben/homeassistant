@@ -47,6 +47,43 @@ http:
 automation: !include automations.yaml
 script: !include scripts.yaml
 
+# ── AI Vision — persistent state ─────────────────────────────────────────────
+input_text:
+  vision_last_analysis:
+    name: "Vision Last Analysis"
+    max: 255
+    icon: mdi:eye-outline
+
+input_boolean:
+  package_at_door:
+    name: "Package at Door"
+    icon: mdi:package-variant
+
+# ── AI Vision — template sensors ─────────────────────────────────────────────
+template:
+  - sensor:
+      - name: "Vision Person Detected"
+        unique_id: "vision_person_detected"
+        icon: mdi:account-eye
+        state: >
+          {% set raw = states('input_text.vision_last_analysis') %}
+          {{ 'true' if raw | regex_search('"person_detected":\s*true') else 'false' }}
+
+      - name: "Vision Door State"
+        unique_id: "vision_door_state"
+        icon: mdi:door
+        state: >
+          {% set raw = states('input_text.vision_last_analysis') %}
+          {% set parts = raw.split('"door_state": "') %}
+          {{ parts[1].split('"')[0] if parts | length > 1 else 'unknown' }}
+
+      - name: "Vision Anomaly"
+        unique_id: "vision_anomaly"
+        icon: mdi:alert-eye
+        state: >
+          {% set raw = states('input_text.vision_last_analysis') %}
+          {{ 'true' if raw | regex_search('"anomaly":\s*true') else 'false' }}
+
 sensor:
   # Derivadas de contadores Meshtastic d3st — tasa de cambio (anomalías)
   - platform: derivative

@@ -358,3 +358,67 @@ views:
                 name: RX/min
               - entity: sensor.d3st_tasa_tx
                 name: TX/min
+
+  # ── AI Vision dashboard ──────────────────────────────────────────────────────
+  - title: AI Vision
+    path: ai-vision
+    icon: mdi:eye-outline
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        title: Entrance Camera Analysis
+        column_span: 2
+        columns: 2
+        cards:
+          # Last analysis summary
+          - type: markdown
+            title: Last Analysis
+            content: >
+              **{{ now().strftime('%H:%M') }}** —
+              {{ states('input_text.vision_last_analysis') }}
+
+          # Key facts at a glance
+          - type: glance
+            title: Vision Status
+            show_name: true
+            show_icon: true
+            show_state: true
+            entities:
+              - entity: sensor.vision_person_detected
+                name: Person
+                icon: mdi:account-eye
+              - entity: sensor.vision_door_state
+                name: Door
+                icon: mdi:door
+              - entity: sensor.vision_anomaly
+                name: Anomaly
+                icon: mdi:alert-eye
+              - entity: input_boolean.package_at_door
+                name: Package
+                icon: mdi:package-variant
+
+      - type: grid
+        title: Camera Feed
+        column_span: 2
+        columns: 1
+        cards:
+          - type: picture-entity
+            entity: camera.tapo_camera_2f13_hd_stream
+            camera_image: camera.tapo_camera_2f13_hd_stream
+            show_name: false
+            show_state: false
+            tap_action:
+              action: more-info
+
+          # Manual trigger button for on-demand analysis
+          - type: button
+            name: Analyze Now
+            icon: mdi:eye-refresh-outline
+            tap_action:
+              action: perform-action
+              perform_action: script.analyze_camera
+              target: {}
+            show_name: true
+            show_icon: true
+            show_state: false
