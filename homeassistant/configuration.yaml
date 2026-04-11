@@ -42,10 +42,6 @@ http:
     - ::1
   ip_ban_enabled: true
   login_attempts_threshold: 3
-template:
-  - sensor:
-      - name: "Calendar Message"
-        state: "{{ state_attr('calendar.homeassistant', 'message') }}"
 
 automation: !include automations.yaml
 script: !include scripts.yaml
