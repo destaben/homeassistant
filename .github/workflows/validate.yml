@@ -5,9 +5,9 @@ on:
     branches: [main, master]
   pull_request:
     paths:
-      - "homeassistant/**/*.yaml"
+      - "ha/**/*.yaml"
       - "docker-compose.yaml"
-      - "nginx.conf"
+      - "nginx/nginx.conf"
 
 jobs:
   yaml-lint:
@@ -22,11 +22,11 @@ jobs:
       - name: Lint HA YAML files
         run: |
           yamllint -c .yamllint.yml \
-            homeassistant/configuration.yaml \
-            homeassistant/automations.yaml \
-            homeassistant/scripts.yaml \
-            homeassistant/scenes.yaml \
-            homeassistant/ui-lovelace.yaml
+            ha/configuration.yaml \
+            ha/automations.yaml \
+            ha/scripts.yaml \
+            ha/scenes.yaml \
+            ha/ui-lovelace.yaml
 
   docker-compose-validate:
     name: Docker Compose Validate
@@ -51,12 +51,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Write HA version file
-        run: echo "2026.2" > homeassistant/.HA_VERSION
+        run: echo "2026.2" > ha/.HA_VERSION
 
       - name: Create dummy secrets.yaml for CI
-        run: cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
+        run: cp ha/secrets.yaml.example ha/secrets.yaml
 
       - name: Run Home Assistant config check
         uses: frenck/action-home-assistant@v1
         with:
-          path: ./homeassistant
+          path: ./ha

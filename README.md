@@ -17,7 +17,7 @@ Self-hosted smart home running on Docker Compose. This repository is a full disa
 ## Repository Layout
 
 ```
-homeassistant/              # HA config (bind-mounted to /config in container)
+ha/                         # HA config (bind-mounted to /config in container)
   configuration.yaml        # HTTP, MQTT switches, templates, integrations
   automations.yaml          # All automations (dot-notation aliases)
   scripts.yaml              # Reusable scripts (camera presets)
@@ -29,10 +29,14 @@ homeassistant/              # HA config (bind-mounted to /config in container)
   blueprints/               # ⚠️ NOT versioned
   www/                      # ⚠️ NOT versioned — LLM Vision snapshots, etc.
 
-data/                       # ⚠️ NOT versioned — Zigbee2MQTT state + network key
-mosquitto_config/           # Mosquitto static config (versioned)
-etc_mosquitto/              # ⚠️ NOT versioned — runtime certs/passwd
-nginx.conf                  # Reverse proxy config (versioned)
+zigbee2mqtt/                # ⚠️ NOT versioned — Zigbee2MQTT state + network key
+mosquitto/
+  config/                   # Mosquitto static config (versioned)
+    mosquitto.conf
+    mosquitto_certs.sh
+  certs/                    # ⚠️ NOT versioned — runtime certs/passwd
+nginx/
+  nginx.conf                # Reverse proxy config (versioned)
 cloudflared/config.yml      # Tunnel config (versioned)
 docker-compose.yaml         # All service definitions (versioned)
 .env.example                # Env var template — copy to .env
@@ -59,14 +63,14 @@ cd homeassistant
 cp .env.example .env
 # Edit .env — add CLOUDFLARE_TUNNEL_TOKEN
 
-cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
+cp ha/secrets.yaml.example ha/secrets.yaml
 # Edit secrets.yaml — add all credentials
 ```
 
 ### 3. Restore Zigbee2MQTT config
 
-`data/` is gitignored because it contains the Zigbee network key. You need to either:
-- Restore `data/configuration.yaml` from a secure backup, **or**
+`zigbee2mqtt/` is gitignored because it contains the Zigbee network key. You need to either:
+- Restore `zigbee2mqtt/configuration.yaml` from a secure backup, **or**
 - Re-pair all Zigbee devices via the Zigbee2MQTT dashboard after first boot
 
 ### 4. Start services
@@ -118,7 +122,7 @@ Every push to `main` runs three checks via GitHub Actions:
 Run locally before pushing:
 ```bash
 pip install yamllint
-yamllint -c .yamllint.yml homeassistant/configuration.yaml homeassistant/automations.yaml
+yamllint -c .yamllint.yml ha/configuration.yaml ha/automations.yaml
 docker compose config --quiet
 ```
 
@@ -138,7 +142,7 @@ See [GitHub Issues](https://github.com/destaben/homeassistant/issues) for the fu
 
 ## Security Notes
 
-- `secrets.yaml`, `.env`, `data/`, `etc_mosquitto/` are gitignored — never force-add them
+- `secrets.yaml`, `.env`, `zigbee2mqtt/`, `mosquitto/certs/` are gitignored — never force-add them
 - All credentials must use `!secret` references — never inline values
 - MQTT currently allows anonymous connections ([#2](https://github.com/destaben/homeassistant/issues/2)) — fix before exposing externally
 - HA container runs `privileged: true` ([#9](https://github.com/destaben/homeassistant/issues/9)) — reduce when integration compatibility allows
@@ -146,7 +150,7 @@ See [GitHub Issues](https://github.com/destaben/homeassistant/issues) for the fu
 ## Updating
 
 ```bash
-git add homeassistant/automations.yaml homeassistant/configuration.yaml  # etc.
+git add ha/automations.yaml ha/configuration.yaml  # etc.
 git commit -m "feat(automation): describe what changed"
 git push
 ```
