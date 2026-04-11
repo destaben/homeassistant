@@ -4,12 +4,19 @@ services:
     image: "ghcr.io/home-assistant/home-assistant:2026.2"
     volumes:
       - ./homeassistant:/config
-      - /dev/ttyUSB0:/dev/ttyUSB0
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    cap_add:
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "8123:8123"
+    networks:
+      - homeassistant-net
     restart: always
-    privileged: true
-    network_mode: host
 
   zigbee2mqtt:
     container_name: zigbee2mqtt
@@ -24,6 +31,8 @@ services:
         - TZ=Europe/Madrid
     devices:
         - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_fc0671e16fbeed119095a04838a92db5-if00-port0:/dev/ttyACM0
+    networks:
+      - homeassistant-net
 
   mosquitto:
     image: eclipse-mosquitto:2.0
@@ -35,6 +44,8 @@ services:
     volumes:
       - ./etc_mosquitto:/etc/mosquitto
       - ./mosquitto_config:/mosquitto/config/
+    networks:
+      - homeassistant-net
       
   # Only needed if you want to enable gassistant integration
   #nginx:
@@ -73,3 +84,6 @@ services:
 networks:
   homeassistant-net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
