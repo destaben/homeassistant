@@ -54,7 +54,12 @@ jobs:
         run: echo "2026.2" > homeassistant/.HA_VERSION
 
       - name: Create dummy secrets.yaml for CI
-        run: cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
+        run: |
+          if [ -f homeassistant/secrets.yaml.example ]; then
+            cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
+          else
+            touch homeassistant/secrets.yaml
+          fi
 
       - name: Run Home Assistant config check
         uses: frenck/action-home-assistant@v1
