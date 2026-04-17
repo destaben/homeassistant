@@ -32,6 +32,24 @@ api:
 logbook:
 history:
 
+recorder:
+  purge_keep_days: 90
+  include:
+    entities:
+      - binary_sensor.door_1_contact
+      - binary_sensor.motion_1_occupancy
+      - binary_sensor.motion_2_occupancy
+      - binary_sensor.presence_1_occupancy
+      - binary_sensor.window_1_contact
+      - binary_sensor.window_2_contact
+      - binary_sensor.window_3_contact
+      - person.destaben
+      - person.carolmontaes
+      - switch.smart_plug_1909121534757325186448e1e903790b_outlet
+      - switch.smart_plug_1909122087239425186448e1e9039bc1_outlet
+      - vacuum.xiaomi_robot_vacuum_x20_sweep_mode
+      - fan.zhimi_mc2_8977_air_purifier
+
 assist_pipeline:
 
 http:
@@ -46,6 +64,23 @@ http:
 
 automation: !include automations.yaml
 script: !include scripts.yaml
+
+template:
+  - binary_sensor:
+    - name: "Peak Electricity Hours"
+      unique_id: "peak_electricity_hours"
+      device_class: power
+      state: >
+        {% set h = now().hour %}
+        {{ (h >= 10 and h < 14) or (h >= 18 and h < 22) }}
+    - name: "Predicted Arrival Soon"
+      unique_id: "predicted_arrival_soon"
+      state: >
+        {% set h = now().hour %}
+        {% set dow = now().weekday() %}
+        {% set in_window = (dow < 5 and h >= 17 and h < 20) or
+                           (dow >= 5 and h >= 11 and h < 14) %}
+        {{ in_window and states('person.destaben') == 'not_home' }}
 
 sensor:
   # Derivadas de contadores Meshtastic d3st — tasa de cambio (anomalías)
