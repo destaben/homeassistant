@@ -169,6 +169,9 @@
   - condition: time
     after: 07:45:00
     before: '23:00:00'
+  - condition: state
+    entity_id: input_boolean.vacation_mode
+    state: "off"
   - condition: or
     conditions:
     - condition: device
@@ -247,12 +250,15 @@
   mode: single
 - id: 85bfdda99f40478e8031debd5bf5d85d
   alias: home.empty
+  description: "Turns off lights and plugs after both persons have been away for 5 minutes"
   triggers:
   - entity_id: person.destaben
     to: not_home
+    for: "00:05:00"
     trigger: state
   - entity_id: person.carolmontaes
     to: not_home
+    for: "00:05:00"
     trigger: state
   conditions:
   - condition: and
@@ -264,6 +270,10 @@
       entity_id: person.carolmontaes
       state: not_home
   actions:
+  - target:
+      entity_id: input_boolean.home_occupied
+    action: input_boolean.turn_off
+    data: {}
   - target:
       entity_id: switch.light
     action: switch.turn_off
@@ -583,4 +593,63 @@
         notification_icon: mdi:alarm-light
         color: red
     action: notify.mobile_app_sm_a346b
+  mode: single
+- id: f1a2b3c4d5e647f8a9b0c1d2e3f4a5b6
+  alias: presence.welcome_home
+  description: "Turns on entry lights and notifies when the first person arrives home after everyone was away"
+  triggers:
+  - trigger: state
+    entity_id:
+      - person.destaben
+      - person.carolmontaes
+    to: "home"
+  conditions:
+  - condition: state
+    entity_id: input_boolean.home_occupied
+    state: "off"
+  actions:
+  - target:
+      entity_id: input_boolean.home_occupied
+    action: input_boolean.turn_on
+    data: {}
+  - target:
+      entity_id:
+        - switch.light_1_mqtt
+        - switch.light_2_mqtt
+    action: switch.turn_on
+    data: {}
+  - action: notify.mobile_app_davids_iphone
+    data:
+      title: "Welcome home!"
+      message: "{{ trigger.to_state.attributes.friendly_name }} has arrived home."
+  mode: single
+- id: a2b3c4d5e6f748a9b0c1d2e3f4a5b6c7
+  alias: vacation_mode.on_enable
+  description: "Ensures the alarm automation is active and notifies when vacation mode is enabled"
+  triggers:
+  - trigger: state
+    entity_id: input_boolean.vacation_mode
+    to: "on"
+  actions:
+  - action: automation.turn_on
+    target:
+      entity_id: automation.alarm
+    data: {}
+  - action: notify.mobile_app_davids_iphone
+    data:
+      title: "Vacation mode ON"
+      message: "Vacation mode activated. Alarm automation is now active."
+  mode: single
+- id: b3c4d5e6f7a849b0c1d2e3f4a5b6c7d8
+  alias: vacation_mode.on_disable
+  description: "Notifies when vacation mode is disabled"
+  triggers:
+  - trigger: state
+    entity_id: input_boolean.vacation_mode
+    to: "off"
+  actions:
+  - action: notify.mobile_app_davids_iphone
+    data:
+      title: "Vacation mode OFF"
+      message: "Vacation mode deactivated. Normal automation restored."
   mode: single

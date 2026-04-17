@@ -273,6 +273,22 @@ views:
         name: Alarma
         tap_action:
           action: toggle
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: input_boolean.home_occupied
+        name: Home Occupied
+        tap_action:
+          action: toggle
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: input_boolean.vacation_mode
+        name: Vacation Mode
+        tap_action:
+          action: toggle
   - title: Meshtastic d3st
     path: meshtastic
     icon: mdi:radio-handheld
