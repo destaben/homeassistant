@@ -117,6 +117,9 @@ sensor:
     sampling_size: 1000
 
 mqtt:
+  broker: mosquitto
+  username: !secret mqtt_username
+  password: !secret mqtt_password
   switch:
     - name: "light_1_mqtt"
       state_topic: "zigbee2mqtt/light_1"
