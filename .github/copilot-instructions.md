@@ -7,8 +7,6 @@ This is a **self-hosted Home Assistant smart home** running on Docker Compose. T
 - **Home Assistant** (`homeassistant/`) — core automation platform (v2026.2+)
 - **Zigbee2MQTT** (`data/`) — Zigbee mesh coordinator via Sonoff 3.0 USB dongle
 - **Eclipse Mosquitto** (`mosquitto_config/`, `etc_mosquitto/`) — MQTT broker
-- **nginx** (`nginx.conf`) — security reverse proxy for Google Assistant OAuth
-- **Cloudflared** (`cloudflared/`) — Cloudflare tunnel for external access
 
 ## Repository Layout
 
@@ -25,8 +23,6 @@ homeassistant/          # HA config (mapped to /config inside container)
 data/                   # Zigbee2MQTT state (gitignored — contains network key)
 mosquitto_config/       # Mosquitto static config
 docker-compose.yaml     # All services definition
-nginx.conf              # Reverse proxy config for Google Assistant
-cloudflared/config.yml  # Cloudflare tunnel config
 ```
 
 ## Key Conventions
@@ -110,7 +106,8 @@ There is no automated test suite. Changes are validated by:
 4. Test via Developer Tools → Services in HA UI
 
 ### Re-enabling Google Assistant
-1. Fix `/auth/token` POST method in `nginx.conf` (see issue #3)
-2. Set `CLOUDFLARE_TUNNEL_TOKEN` in `.env`
-3. Uncomment nginx + cloudflared services in `docker-compose.yaml`
-4. Run `docker compose up -d nginx cloudflared`
+1. Add `nginx.conf` reverse proxy config (see issue [#3](https://github.com/destaben/homeassistant/issues/3))
+2. Add `cloudflared/config.yml` tunnel config
+3. Set `CLOUDFLARE_TUNNEL_TOKEN` in `.env`
+4. Add nginx + cloudflared services to `docker-compose.yaml` (see issue [#5](https://github.com/destaben/homeassistant/issues/5))
+5. Run `docker compose up -d nginx cloudflared`
