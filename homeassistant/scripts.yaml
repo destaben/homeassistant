@@ -23,7 +23,7 @@ meshtastic_public_broadcast:
         text:
           multiline: false
   mode: queued
-  max: 1
+  max: 2
   sequence:
   - condition: template
     value_template: "{{ message is string and message | length > 0 and message | length <= 240 }}"
