@@ -47,6 +47,34 @@ http:
 automation: !include automations.yaml
 script: !include scripts.yaml
 
+input_text:
+  meshtastic_public_last_message:
+    name: Meshtastic Public Last Message
+    max: 240
+  meshtastic_public_last_sender:
+    name: Meshtastic Public Last Sender
+    max: 128
+  meshtastic_public_last_channel:
+    name: Meshtastic Public Last Channel
+    max: 32
+
+input_datetime:
+  meshtastic_public_last_received:
+    name: Meshtastic Public Last Received
+    has_date: true
+    has_time: true
+
+input_number:
+  meshtastic_public_last_sender_hops:
+    name: Meshtastic Public Last Sender Hops
+    min: 0
+    max: 7
+    step: 1
+
+input_boolean:
+  meshtastic_public_last_sender_hops_available:
+    name: Meshtastic Public Last Sender Hops Available
+
 sensor:
   # Derivadas de contadores Meshtastic d3st — tasa de cambio (anomalías)
   - platform: derivative

@@ -14,3 +14,21 @@ move_camera_salon:
       entity_id: select.tapo_camera_2f13_move_to_preset
     data:
       option: Salon
+meshtastic_public_broadcast:
+  alias: meshtastic_public_broadcast
+  fields:
+    message:
+      required: true
+      selector:
+        text:
+          multiline: false
+  mode: queued
+  max: 1
+  sequence:
+  - condition: template
+    value_template: "{{ message is string and message | length > 0 and message | length <= 240 }}"
+  - action: meshtastic.broadcast_channel_message
+    data:
+      channel: meshtastic.gateway_d3st_channel_mediumfast
+      message: "{{ message }}"
+      ack: true

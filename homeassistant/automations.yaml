@@ -10,6 +10,73 @@
       entity_id: switch.light
   mode: single
   id: 85d5859e1db641a1888261c7e50bc843
+- id: meshtastic_public_last_message
+  alias: meshtastic.public_last_message
+  description: Store the latest received MediumFast message for the public lab API.
+  triggers:
+  - trigger: event
+    event_type: meshtastic_api_text_message
+  conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.event.data.data.to.channel ==
+         state_attr('meshtastic.gateway_d3st_channel_mediumfast', 'index') }}
+  - condition: template
+    value_template: >-
+      {% set node_id = trigger.event.data.data.from | string %}
+      {% set sender = 'sensor.meshtastic_d3st_' ~ node_id ~ '_node_long_name' %}
+      {{ trigger.event.data.data.message is string and
+         trigger.event.data.data.message | length > 0 and
+         states(sender) not in ['unknown', 'unavailable'] }}
+  actions:
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.meshtastic_public_last_message
+    data:
+      value: "{{ trigger.event.data.data.message[:240] }}"
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.meshtastic_public_last_sender
+    data:
+      value: >-
+        {{ states('sensor.meshtastic_d3st_' ~
+                  (trigger.event.data.data.from | string) ~ '_node_long_name')[:128] }}
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.meshtastic_public_last_channel
+    data:
+      value: MediumFast
+  - action: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.meshtastic_public_last_received
+    data:
+      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: >-
+          {% set hops = states('sensor.meshtastic_d3st_' ~
+                               (trigger.event.data.data.from | string) ~
+                               '_node_hops_away') %}
+          {{ hops not in ['unknown', 'unavailable'] }}
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.meshtastic_public_last_sender_hops
+        data:
+          value: >-
+            {{ states('sensor.meshtastic_d3st_' ~
+                      (trigger.event.data.data.from | string) ~
+                      '_node_hops_away') | int }}
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.meshtastic_public_last_sender_hops_available
+    default:
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.meshtastic_public_last_sender_hops_available
+  mode: queued
+  max: 10
 - alias: button1.doble_press
   trigger:
   - platform: mqtt
