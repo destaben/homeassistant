@@ -651,3 +651,15 @@
         color: red
     action: notify.mobile_app_sm_a346b
   mode: single
+- id: meshtastic_public_broadcast_event
+  alias: meshtastic.public_broadcast_event
+  description: Broadcasts a relay-originated message only through the fixed MediumFast script.
+  triggers:
+  - trigger: event
+    event_type: meshtastic_public_broadcast
+  conditions: []
+  actions:
+  - action: script.meshtastic_public_broadcast
+    data:
+      message: "{{ trigger.event.data.message }}"
+  mode: single
