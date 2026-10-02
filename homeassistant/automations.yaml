@@ -221,16 +221,12 @@
     before: '23:00:00'
   - condition: or
     conditions:
-    - condition: device
-      device_id: fb9ba01b5a9d368a2993be502db8e24f
-      domain: device_tracker
-      entity_id: 2c0f2745c4a6403948493efba58d06d1
-      type: is_home
-    - condition: device
-      device_id: ac2b0047cdc113b6d167fba74c5b2b94
-      domain: device_tracker
-      entity_id: c6db7b9442730833965e6c13561aa5d2
-      type: is_home
+    - condition: state
+      entity_id: person.destaben
+      state: home
+    - condition: state
+      entity_id: person.carolmontaes
+      state: home
   - condition: not
     conditions:
     - condition: state
@@ -298,21 +294,15 @@
 - id: 85bfdda99f40478e8031debd5bf5d85d
   alias: home.empty
   triggers:
-  - entity_id: person.destaben
-    to: not_home
-    trigger: state
-  - entity_id: person.carolmontaes
-    to: not_home
+  - entity_id:
+    - person.destaben
+    - person.carolmontaes
     trigger: state
   conditions:
-  - condition: and
-    conditions:
-    - condition: state
-      entity_id: person.destaben
-      state: not_home
-    - condition: state
-      entity_id: person.carolmontaes
-      state: not_home
+  - condition: template
+    value_template: >-
+      {{ states('person.destaben') not in ['home', 'unknown', 'unavailable']
+         and states('person.carolmontaes') not in ['home', 'unknown', 'unavailable'] }}
   actions:
   - target:
       entity_id: switch.light
@@ -327,6 +317,26 @@
     data:
       option: Entrada
     action: select.select_option
+  - target:
+      entity_id: automation.alarm
+    action: automation.turn_on
+  mode: single
+- id: 3c17b2f9a2a640f894db49d8f955195c
+  alias: presence.alarm_disarm
+  description: Disarm the security automation as soon as Carol or David returns home.
+  triggers:
+  - entity_id:
+    - person.destaben
+    - person.carolmontaes
+    to: home
+    trigger: state
+  conditions: []
+  actions:
+  - target:
+      entity_id: automation.alarm
+    action: automation.turn_off
+    data:
+      stop_actions: true
   mode: single
 - id: c96a836d1b6943e8a9b70121873d40a1
   alias: night_mode
@@ -525,13 +535,11 @@
 
       '
   actions:
-  - data:
-      title: Ender 3 V3 SE
+  - action: notify.mobile_app_david_iphone
+    data:
       message: 'Estado cambiado: {{ trigger.from_state.state }} → {{ trigger.to_state.state
-        }}
-
-        '
-    action: notify.mobile_app_davids_iphone
+        }}'
+      title: Ender 3 V3 SE
   mode: single
 - id: '1740075137241'
   alias: living.motion
@@ -552,8 +560,8 @@
   mode: single
 - id: '1740090000001'
   alias: alarm.security_alert
-  description: Envía alerta con snapshot de cámara cuando se detecta apertura de
-    puerta o ventana mientras la alarma está activa. Cooldown de 5 minutos entre alertas.
+  description: Envía alerta con snapshot de cámara cuando se detecta apertura de puerta
+    o ventana mientras la alarma está activa. Cooldown de 5 minutos entre alertas.
   triggers:
   - entity_id: binary_sensor.door_1_contact
     to: 'on'
@@ -572,7 +580,8 @@
     entity_id: automation.alarm
     state: 'on'
   - condition: template
-    value_template: "{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds() > 300 }}" # cooldown 5 min
+    value_template: '{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds()
+      > 300 }}'
   actions:
   - action: media_player.volume_set
     target:
@@ -597,20 +606,21 @@
   - delay:
       seconds: 5
   - variables:
-      snapshot_ts: "{{ now().strftime('%Y%m%d_%H%M%S') }}"
+      snapshot_ts: '{{ now().strftime(''%Y%m%d_%H%M%S'') }}'
   - target:
       entity_id: camera.tapo_camera_2f13
     data:
-      filename: "/config/www/snapshots/alarm_{{ snapshot_ts }}.jpg"
+      filename: /config/www/snapshots/alarm_{{ snapshot_ts }}.jpg
     action: camera.snapshot
   - delay:
       seconds: 2
   - data:
       title: "\U0001F6A8 ALARMA ACTIVADA"
-      message: "{{ trigger.to_state.attributes.friendly_name }} activado mientras la alarma está activa"
+      message: '{{ trigger.to_state.attributes.friendly_name }} activado mientras
+        la alarma está activa'
       data:
         attachment:
-          url: "http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts }}.jpg"
+          url: http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts }}.jpg
         push:
           sound:
             name: default
@@ -621,10 +631,11 @@
     action: notify.mobile_app_davids_iphone
   - data:
       title: "\U0001F6A8 ALARMA ACTIVADA"
-      message: "{{ trigger.to_state.attributes.friendly_name }} activado mientras la alarma está activa"
+      message: '{{ trigger.to_state.attributes.friendly_name }} activado mientras
+        la alarma está activa'
       data:
         attachment:
-          url: "http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts }}.jpg"
+          url: http://192.168.1.222:8123/local/snapshots/alarm_{{ snapshot_ts }}.jpg
         push:
           sound:
             name: default
