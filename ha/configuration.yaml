@@ -34,16 +34,6 @@ history:
 
 assist_pipeline:
 
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 192.168.1.222
-    - 127.0.0.1
-    - ::1
-    - 172.22.0.0/24
-  ip_ban_enabled: true
-  login_attempts_threshold: 3
-
 automation: !include automations.yaml
 script: !include scripts.yaml
 
