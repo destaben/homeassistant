@@ -4,14 +4,14 @@
 
 This is a **self-hosted Home Assistant smart home** running on Docker Compose. The stack consists of:
 
-- **Home Assistant** (`homeassistant/`) — core automation platform (v2026.2+)
-- **Zigbee2MQTT** (`data/`) — Zigbee mesh coordinator via Sonoff 3.0 USB dongle
-- **Eclipse Mosquitto** (`mosquitto_config/`, `etc_mosquitto/`) — MQTT broker
+- **Home Assistant** (`ha/`) — core automation platform (v2026.2+)
+- **Zigbee2MQTT** (`zigbee2mqtt/`) — Zigbee mesh coordinator via Sonoff 3.0 USB dongle
+- **Eclipse Mosquitto** (`mosquitto/config/`, `mosquitto/certs/`) — MQTT broker
 
 ## Repository Layout
 
 ```
-homeassistant/          # HA config (mapped to /config inside container)
+ha/                 # HA config (mapped to /config inside container)
   configuration.yaml    # Main HA config — lovelace, http, mqtt, templates
   automations.yaml      # All automations (flat list, not split by room)
   scripts.yaml          # Reusable scripts (camera presets)
@@ -20,8 +20,10 @@ homeassistant/          # HA config (mapped to /config inside container)
   secrets.yaml          # Real secrets — NEVER commit this file
   secrets.yaml.example  # Template for secrets — keep in sync with actual keys
   custom_components/    # HACS and custom integrations (gitignored)
-data/                   # Zigbee2MQTT state (gitignored — contains network key)
-mosquitto_config/       # Mosquitto static config
+zigbee2mqtt/            # Zigbee2MQTT state (gitignored — contains network key)
+mosquitto/
+  config/               # Mosquitto static config
+  certs/                # Runtime certs/passwd (gitignored)
 docker-compose.yaml     # All services definition
 ```
 
@@ -43,8 +45,8 @@ docker-compose.yaml     # All services definition
 
 ### Security Rules
 - **Never** add credentials, tokens, keys, or passwords to any tracked file
-- **Never** commit `homeassistant/secrets.yaml` (it is gitignored)
-- **Never** commit `data/configuration.yaml` (contains Zigbee network key, gitignored)
+- **Never** commit `ha/secrets.yaml` (it is gitignored)
+- **Never** commit `zigbee2mqtt/configuration.yaml` (contains Zigbee network key, gitignored)
 - **Never** commit `.env` (contains Cloudflare tunnel token, gitignored)
 - MQTT topics follow `zigbee2mqtt/<friendly_name>` convention
 
@@ -73,8 +75,8 @@ docker-compose.yaml     # All services definition
 The AI/agent features in this project are actively being developed. Key facts:
 
 - `assist_pipeline:` is already enabled in `configuration.yaml`
-- `llmvision` integration stores snapshots in `homeassistant/www/llmvision/`
-- Camera reference images are in `homeassistant/www/llmvision/reference/`
+- `llmvision` integration stores snapshots in `ha/www/llmvision/`
+- Camera reference images are in `ha/www/llmvision/reference/`
 - Voice assistant is handled via HA's Assist pipeline + external LLM backend
 - Agentic automations use the ReAct pattern: Read sensor → Reason → Act → Verify
 
@@ -87,7 +89,7 @@ When working on AI features, prefer:
 
 There is no automated test suite. Changes are validated by:
 1. `docker compose config --quiet` — validate docker-compose syntax
-2. `yamllint homeassistant/*.yaml` — YAML syntax check
+2. `yamllint ha/*.yaml` — YAML syntax check
 3. Home Assistant's built-in **Developer Tools → YAML → Check Configuration** — validates HA config
 4. `docker compose restart homeassistant` — live reload for config changes
 
@@ -100,14 +102,14 @@ There is no automated test suite. Changes are validated by:
 4. Add to `automations.yaml` as needed
 
 ### Adding a new automation
-1. Add to `homeassistant/automations.yaml`
+1. Add to `ha/automations.yaml`
 2. Use dot-notation alias: `<domain>.<action>` (e.g., `bedroom.motion_lights`)
 3. Use `!secret` for any sensitive values
 4. Test via Developer Tools → Services in HA UI
 
 ### Re-enabling Google Assistant
-1. Add `nginx.conf` reverse proxy config (see issue [#3](https://github.com/destaben/homeassistant/issues/3))
-2. Add `cloudflared/config.yml` tunnel config
+1. Add nginx reverse proxy configuration (see issue [#3](https://github.com/destaben/homeassistant/issues/3))
+2. Add Cloudflared tunnel configuration
 3. Set `CLOUDFLARE_TUNNEL_TOKEN` in `.env`
-4. Add nginx + cloudflared services to `docker-compose.yaml` (see issue [#5](https://github.com/destaben/homeassistant/issues/5))
+4. Add nginx and Cloudflared services to `docker-compose.yaml` (see issue [#5](https://github.com/destaben/homeassistant/issues/5))
 5. Run `docker compose up -d nginx cloudflared`

@@ -17,7 +17,7 @@ Self-hosted smart home running on Docker Compose. This repository is a full disa
 ## Repository Layout
 
 ```
-homeassistant/              # HA config (bind-mounted to /config in container)
+ha/                         # HA config (bind-mounted to /config in container)
   configuration.yaml        # HTTP, MQTT switches, templates, integrations
   automations.yaml          # All automations (dot-notation aliases)
   scripts.yaml              # Reusable scripts (camera presets)
@@ -29,12 +29,13 @@ homeassistant/              # HA config (bind-mounted to /config in container)
   blueprints/               # ⚠️ NOT versioned
   www/                      # ⚠️ NOT versioned — LLM Vision snapshots, etc.
 
-data/                       # ⚠️ NOT versioned — Zigbee2MQTT state + network key
-mosquitto_config/           # Mosquitto static config (versioned)
-etc_mosquitto/              # ⚠️ NOT versioned — runtime certs/passwd
+zigbee2mqtt/                # ⚠️ NOT versioned — Zigbee2MQTT state + network key
+mosquitto/
+  config/                   # Mosquitto static config (versioned)
+    mosquitto.conf
+    mosquitto_certs.sh
+  certs/                    # ⚠️ NOT versioned — runtime certs/passwd
 docker-compose.yaml         # All service definitions (versioned)
-.env.example                # Env var template — copy to .env
-.env                        # ⚠️ NOT versioned — Cloudflare tunnel token
 AGENTS.md                   # AI agent rules and device reference
 .github/
   copilot-instructions.md   # GitHub Copilot workspace context
@@ -54,65 +55,84 @@ cd homeassistant
 ### 2. Create secrets
 
 ```bash
-cp .env.example .env
-# Edit .env — add CLOUDFLARE_TUNNEL_TOKEN
-
-cp homeassistant/secrets.yaml.example homeassistant/secrets.yaml
+cp ha/secrets.yaml.example ha/secrets.yaml
 # Edit secrets.yaml — add all credentials
 ```
 
 ### 2a. Create MQTT password file
 
-The Mosquitto broker requires a password file at `./etc_mosquitto/passwd` (mapped to
+The Mosquitto broker requires a password file at `./mosquitto/certs/passwd` (mapped to
 `/etc/mosquitto/passwd` inside the container).  Run these commands **after** the
 containers have started at least once (so the image is available), or run them
 independently against the Mosquitto image:
 
 ```bash
-mkdir -p etc_mosquitto
+sudo mkdir -p mosquitto/certs
 
 # Create the password file with the homeassistant user (-c creates a new file)
-docker run --rm -v "$(pwd)/etc_mosquitto:/etc/mosquitto" \
+sudo docker run --rm -v "$(pwd)/mosquitto/certs:/etc/mosquitto" \
   eclipse-mosquitto:2.0 \
   mosquitto_passwd -c -b /etc/mosquitto/passwd homeassistant YOUR_HA_MQTT_PASSWORD
 
 # Add the zigbee2mqtt user
-docker run --rm -v "$(pwd)/etc_mosquitto:/etc/mosquitto" \
+sudo docker run --rm -v "$(pwd)/mosquitto/certs:/etc/mosquitto" \
   eclipse-mosquitto:2.0 \
   mosquitto_passwd -b /etc/mosquitto/passwd zigbee2mqtt YOUR_Z2M_MQTT_PASSWORD
 ```
 
-Set the Zigbee2MQTT password in `data/configuration.yaml` under `mqtt.password`.
+Set the Zigbee2MQTT password in `zigbee2mqtt/configuration.yaml` under `mqtt.password`.
 Configure Home Assistant separately in **Settings → Devices & services → MQTT →
 Reconfigure** using host `localhost`, port `1883`, user `homeassistant`, and the
 matching password. MQTT connection credentials are managed by the Home Assistant
 MQTT integration, not by `configuration.yaml`.
 
-> ⚠️ `data/configuration.yaml` is gitignored because it also contains the Zigbee
+> ⚠️ `zigbee2mqtt/configuration.yaml` is gitignored because it also contains the Zigbee
 > network key — edit it carefully and keep it in a secure offline backup.
 
 ### 3. Restore Zigbee2MQTT config
 
-`data/` is gitignored because it contains the Zigbee network key. You need to either:
-- Restore `data/configuration.yaml` from a secure backup, **or**
+`zigbee2mqtt/` is gitignored because it contains the Zigbee network key. You need to either:
+- Restore `zigbee2mqtt/configuration.yaml` from a secure backup, **or**
 - Re-pair all Zigbee devices via the Zigbee2MQTT dashboard after first boot
 
-### 4. Start services
+### 4. Migrate an existing deployment
+
+Stop the stack and back up the existing state before starting the updated Compose configuration. The target paths must not already contain runtime state.
 
 ```bash
-docker compose up -d
+sudo docker compose down
+backup_dir="../homeassistant-layout-backup-$(date +%Y%m%d-%H%M%S)"
+sudo mkdir "$backup_dir"
+sudo cp -a homeassistant data etc_mosquitto "$backup_dir/"
+
+sudo test ! -e ha/.storage
+sudo test ! -e zigbee2mqtt
+sudo test ! -e mosquitto/certs
+sudo cp -a homeassistant/. ha/
+sudo mv data zigbee2mqtt
+sudo mkdir -p mosquitto
+sudo mv etc_mosquitto mosquitto/certs
 ```
 
-Home Assistant will be available at `http://localhost:8123`.
+This preserves Home Assistant's `.storage`, secrets, custom components, databases, and backups. `zigbee2mqtt/` contains the Zigbee network key and `mosquitto/certs/` may contain the MQTT password file.
 
-### 5. Restore HA state (optional)
+### 5. Start services
+
+```bash
+sudo docker compose up -d
+sudo docker compose ps
+```
+
+Home Assistant will be available at `http://localhost:8123`. Confirm all services are healthy and the existing Home Assistant instance loads before deleting `homeassistant/`, `data/`, or `etc_mosquitto/`; the backup directory is the recovery point.
+
+### 6. Restore HA state (optional)
 
 If you have a Home Assistant backup (.tar), restore it from:
 **Settings → System → Backups → Restore**
 
 > Databases, `.storage/`, integrations state, and entity registry are NOT in this repo — they live in HA backups.
 
-### 6. Re-install custom components
+### 7. Re-install custom components
 
 Custom components (HACS integrations) are gitignored. After first boot:
 1. Install HACS from the [official instructions](https://hacs.xyz/docs/use/download/download/)
@@ -146,7 +166,7 @@ Every push to `main` runs three checks via GitHub Actions:
 Run locally before pushing:
 ```bash
 pip install yamllint
-yamllint -c .yamllint.yml homeassistant/configuration.yaml homeassistant/automations.yaml
+yamllint -c .yamllint.yml ha/configuration.yaml ha/automations.yaml
 docker compose config --quiet
 ```
 
@@ -167,15 +187,15 @@ See [GitHub Issues](https://github.com/destaben/homeassistant/issues) for the fu
 
 ## Security Notes
 
-- `secrets.yaml`, `.env`, `data/`, `etc_mosquitto/` are gitignored — never force-add them
+- `secrets.yaml`, `.env`, `zigbee2mqtt/`, `mosquitto/certs/` are gitignored — never force-add them
 - All credentials must use `!secret` references — never inline values
-- MQTT anonymous access is disabled; create `etc_mosquitto/passwd` as described above before starting the broker
+- MQTT anonymous access is disabled; create `mosquitto/certs/passwd` as described above before starting the broker
 - HA container runs `privileged: true` ([#9](https://github.com/destaben/homeassistant/issues/9)) — reduce when integration compatibility allows
 
 ## Updating
 
 ```bash
-git add homeassistant/automations.yaml homeassistant/configuration.yaml  # etc.
+git add ha/automations.yaml ha/configuration.yaml  # etc.
 git commit -m "feat(automation): describe what changed"
 git push
 ```
