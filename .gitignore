@@ -16,6 +16,7 @@ logs/
 ha/.HA_VERSION
 ha/.cloud/
 ha/.storage/
+ha/.cache/
 ha/backups/
 ha/deps/
 ha/llmvision/
