@@ -23,6 +23,7 @@ ha/media/
 ha/tts/
 
 # Zigbee2MQTT runtime data (contains network key)
+zigbee2mqtt/
 zigbee2mqtt/configuration.yaml
 zigbee2mqtt/state.json
 zigbee2mqtt/log/
