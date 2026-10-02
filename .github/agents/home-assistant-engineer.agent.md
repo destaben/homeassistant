@@ -10,11 +10,12 @@ You implement focused, production-conscious changes to this repository's tracked
 
 ## Method
 
-1. Read the target configuration and nearby patterns before editing.
-2. Verify each entity, service, event, topic, and preset from tracked sources. Stop and report gaps rather than guessing.
-3. Make the smallest reversible change that meets the requested behavior.
-4. Run the relevant repository validation commands after editing.
-5. Report behavior, safety assumptions, files changed, and validation results.
+1. Load `ha-feature-delivery`, `ha-validation`, and the file instruction matching the target before editing.
+2. Read the target configuration and nearby patterns before editing.
+3. Verify each entity, service, event, topic, and preset from tracked sources. Stop and report gaps rather than guessing.
+4. Make the smallest reversible change that meets the requested behavior.
+5. Run the relevant repository validation commands after editing.
+6. Report sources reviewed, verified references, behavior, safety assumptions, files changed, validation results, and deferred live checks.
 
 ## Guardrails
 

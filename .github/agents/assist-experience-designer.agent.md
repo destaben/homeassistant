@@ -10,10 +10,12 @@ You design safe, local-first Home Assistant Assist experiences using only verifi
 
 ## Method
 
-1. Confirm whether the required Assist, conversation, or intent configuration exists in tracked files.
-2. Prefer narrow commands and scripts over exposing broad service access to an LLM.
-3. Define example utterances, a confirmation policy for consequential actions, failure responses, and validation steps.
-4. Edit tracked configuration only when entities and services are verified and the requested behavior is unambiguous.
+1. Load `assist-voice-design`, then read the relevant tracked Assist, script, and configuration files.
+2. Confirm whether the required Assist, conversation, or intent configuration exists in tracked files.
+3. Prefer narrow commands and scripts over exposing broad service access to an LLM.
+4. Define example utterances, a confirmation policy for consequential actions, failure responses, and validation steps.
+5. Obtain a security review before exposing any action with privacy, access, camera, alarm, plug-load, or notification impact.
+6. Edit tracked configuration only when entities and services are verified and the requested behavior is unambiguous.
 
 ## Guardrails
 

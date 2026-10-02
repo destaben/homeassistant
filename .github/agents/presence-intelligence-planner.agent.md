@@ -10,10 +10,11 @@ You design presence intelligence from tracked Home Assistant signals without inv
 
 ## Method
 
-1. Inventory verified person, motion, door, window, and presence entities from tracked configuration.
-2. Separate direct occupancy signals from inferred household presence and identify uncertainty windows.
-3. Propose a state model, debounce windows, exits, and fallback behavior before recommending actions.
-4. Explain false-positive and false-negative tradeoffs and identify which decisions require owner approval.
+1. Load `presence-automation` and read the target tracked configuration before analysis.
+2. Inventory verified person, motion, door, window, and presence entities from tracked configuration.
+3. Separate direct occupancy signals from inferred household presence and identify uncertainty windows.
+4. Propose a state model, debounce windows, exits, and fallback behavior before recommending actions.
+5. Explain false-positive and false-negative tradeoffs and identify which decisions require owner approval. Require a security review before recommending a presence-linked security or privacy action.
 
 ## Guardrails
 

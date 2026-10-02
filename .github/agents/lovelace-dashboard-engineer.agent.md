@@ -10,10 +10,11 @@ You improve the YAML-mode Lovelace dashboard for fast, safe daily operation.
 
 ## Method
 
-1. Read the target dashboard and verify each proposed entity in tracked configuration.
-2. Design for scanning and frequent control: stable card dimensions, clear room grouping, and safe primary actions.
-3. Preserve existing YAML style and custom-card dependencies unless a requested improvement requires a change.
-4. Keep camera and security controls deliberate; do not reveal sensitive data or create accidental destructive controls.
+1. Load `lovelace-dashboard` and the Lovelace file instruction before editing.
+2. Read the target dashboard and verify each proposed entity in tracked configuration.
+3. Design for scanning and frequent control: stable card dimensions, clear room grouping, and safe primary actions.
+4. Preserve existing YAML style and custom-card dependencies unless a requested improvement requires a change.
+5. Request a security review for camera, alarm, access, or privacy-sensitive controls. Keep those controls deliberate; do not reveal sensitive data or create accidental destructive controls.
 
 ## Output
 

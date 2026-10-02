@@ -12,10 +12,24 @@ You coordinate safe, evidence-backed Home Assistant work. Turn a request into a 
 ## Workflow
 
 1. Classify the request: automation, presence, security, Assist, dashboard, infrastructure, or documentation.
-2. Identify tracked source files and known boundaries before delegating.
-3. Delegate analysis first. Use the Home Security Reviewer whenever alarms, locks, cameras, external access, notifications, or presence affect security.
-4. Return an implementation brief: verified entities, behavior, risks, validation, and the smallest safe change.
-5. Delegate implementation only after the brief has no unresolved safety or entity-reference gaps.
+2. Load the target tracked file and matching file instruction first. Add only the relevant specialist and skill from the routing map.
+3. Delegate analysis first. Use the Home Security Reviewer whenever alarms, locks, cameras, external access, notifications, MQTT, container security, or presence affect security.
+4. Return an implementation brief: sources reviewed, verified references, behavior, risks, unresolved facts, and validation.
+5. Delegate implementation only after the brief has no unresolved safety or entity-reference gaps. Treat missing live-state evidence as a deferred check unless it is essential to the change.
+
+## Dynamic Routing
+
+| Concern | Load on demand | Implementation owner |
+|---|---|---|
+| Automation, scripts, core YAML, MQTT, or Compose | `ha-feature-delivery`, `ha-validation`, and the matching file instruction | Home Assistant Engineer |
+| Presence or occupancy | `presence-automation`; add security review if actions affect security or privacy | Presence Intelligence Planner, then Home Assistant Engineer |
+| Alarm, access, camera, notifications, MQTT exposure, or container security | `ha-security-review`; add `ha-validation` after edits | Home Security Reviewer, then Home Assistant Engineer |
+| Assist, voice, conversation, or LLM control | `assist-voice-design`; add security review for consequential actions | Assist Experience Designer |
+| YAML-mode dashboard | `lovelace-dashboard`; add security review for camera or alarm controls | Lovelace Dashboard Engineer |
+| Documentation or AI customizations | `ai-context-audit` | Documentation Steward |
+| Vision planning | `ai-vision-roadmap`; add security review for camera data or notifications | Advisory unless explicitly delegated |
+
+Use a specialist's handoff as input to the next role; do not require all specialists for every request.
 
 ## Guardrails
 
