@@ -10,9 +10,9 @@
       entity_id: switch.light
   mode: single
   id: 85d5859e1db641a1888261c7e50bc843
-- id: meshtastic_public_last_message
-  alias: meshtastic.public_last_message
-  description: Store the latest received MediumFast message for the public lab API.
+- id: meshtastic_public_recent_activity
+  alias: meshtastic.public_recent_activity
+  description: Store the five most recent sanitized MediumFast messages for the public lab API.
   triggers:
   - trigger: event
     event_type: meshtastic_api_text_message
@@ -31,50 +31,33 @@
   actions:
   - action: input_text.set_value
     target:
-      entity_id: input_text.meshtastic_public_last_message
+      entity_id: input_text.meshtastic_public_recent_activity_5
     data:
-      value: "{{ trigger.event.data.data.message[:240] }}"
+      value: "{{ states('input_text.meshtastic_public_recent_activity_4') }}"
   - action: input_text.set_value
     target:
-      entity_id: input_text.meshtastic_public_last_sender
+      entity_id: input_text.meshtastic_public_recent_activity_4
+    data:
+      value: "{{ states('input_text.meshtastic_public_recent_activity_3') }}"
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.meshtastic_public_recent_activity_3
+    data:
+      value: "{{ states('input_text.meshtastic_public_recent_activity_2') }}"
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.meshtastic_public_recent_activity_2
+    data:
+      value: "{{ states('input_text.meshtastic_public_recent_activity_1') }}"
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.meshtastic_public_recent_activity_1
     data:
       value: >-
-        {{ states('sensor.meshtastic_d3st_' ~
-                  (trigger.event.data.data.from | string) ~ '_node_long_name')[:128] }}
-  - action: input_text.set_value
-    target:
-      entity_id: input_text.meshtastic_public_last_channel
-    data:
-      value: MediumFast
-  - action: input_datetime.set_datetime
-    target:
-      entity_id: input_datetime.meshtastic_public_last_received
-    data:
-      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: >-
-          {% set hops = states('sensor.meshtastic_d3st_' ~
-                               (trigger.event.data.data.from | string) ~
-                               '_node_hops_away') %}
-          {{ hops not in ['unknown', 'unavailable'] }}
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.meshtastic_public_last_sender_hops
-        data:
-          value: >-
-            {{ states('sensor.meshtastic_d3st_' ~
-                      (trigger.event.data.data.from | string) ~
-                      '_node_hops_away') | int }}
-      - action: input_boolean.turn_on
-        target:
-          entity_id: input_boolean.meshtastic_public_last_sender_hops_available
-    default:
-    - action: input_boolean.turn_off
-      target:
-        entity_id: input_boolean.meshtastic_public_last_sender_hops_available
+        {{ {'message': trigger.event.data.data.message[:140],
+            'sender': states('sensor.meshtastic_d3st_' ~
+              (trigger.event.data.data.from | string) ~ '_node_long_name')[:32],
+            'receivedAt': now().strftime('%Y-%m-%dT%H:%M:%SZ')} | tojson }}
   mode: queued
   max: 10
 - alias: button1.doble_press
