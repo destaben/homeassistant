@@ -82,8 +82,11 @@ docker run --rm -v "$(pwd)/etc_mosquitto:/etc/mosquitto" \
   mosquitto_passwd -b /etc/mosquitto/passwd zigbee2mqtt YOUR_Z2M_MQTT_PASSWORD
 ```
 
-Set the same passwords in `homeassistant/secrets.yaml` (`mqtt_password`) and in
-`data/configuration.yaml` under the `mqtt.password` key for Zigbee2MQTT.
+Set the Zigbee2MQTT password in `data/configuration.yaml` under `mqtt.password`.
+Configure Home Assistant separately in **Settings → Devices & services → MQTT →
+Reconfigure** using host `localhost`, port `1883`, user `homeassistant`, and the
+matching password. MQTT connection credentials are managed by the Home Assistant
+MQTT integration, not by `configuration.yaml`.
 
 > ⚠️ `data/configuration.yaml` is gitignored because it also contains the Zigbee
 > network key — edit it carefully and keep it in a secure offline backup.
