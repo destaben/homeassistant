@@ -238,16 +238,12 @@
     before: '23:00:00'
   - condition: or
     conditions:
-    - condition: device
-      device_id: fb9ba01b5a9d368a2993be502db8e24f
-      domain: device_tracker
-      entity_id: 2c0f2745c4a6403948493efba58d06d1
-      type: is_home
-    - condition: device
-      device_id: ac2b0047cdc113b6d167fba74c5b2b94
-      domain: device_tracker
-      entity_id: c6db7b9442730833965e6c13561aa5d2
-      type: is_home
+    - condition: state
+      entity_id: person.destaben
+      state: home
+    - condition: state
+      entity_id: person.carolmontaes
+      state: home
   - condition: not
     conditions:
     - condition: state
@@ -315,21 +311,15 @@
 - id: 85bfdda99f40478e8031debd5bf5d85d
   alias: home.empty
   triggers:
-  - entity_id: person.destaben
-    to: not_home
-    trigger: state
-  - entity_id: person.carolmontaes
-    to: not_home
+  - entity_id:
+    - person.destaben
+    - person.carolmontaes
     trigger: state
   conditions:
-  - condition: and
-    conditions:
-    - condition: state
-      entity_id: person.destaben
-      state: not_home
-    - condition: state
-      entity_id: person.carolmontaes
-      state: not_home
+  - condition: template
+    value_template: >-
+      {{ states('person.destaben') not in ['home', 'unknown', 'unavailable']
+         and states('person.carolmontaes') not in ['home', 'unknown', 'unavailable'] }}
   actions:
   - target:
       entity_id: switch.light
@@ -344,6 +334,26 @@
     data:
       option: Entrada
     action: select.select_option
+  - target:
+      entity_id: automation.alarm
+    action: automation.turn_on
+  mode: single
+- id: 3c17b2f9a2a640f894db49d8f955195c
+  alias: presence.alarm_disarm
+  description: Disarm the security automation as soon as Carol or David returns home.
+  triggers:
+  - entity_id:
+    - person.destaben
+    - person.carolmontaes
+    to: home
+    trigger: state
+  conditions: []
+  actions:
+  - target:
+      entity_id: automation.alarm
+    action: automation.turn_off
+    data:
+      stop_actions: true
   mode: single
 - id: c96a836d1b6943e8a9b70121873d40a1
   alias: night_mode
