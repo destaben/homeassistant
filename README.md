@@ -9,10 +9,10 @@ Self-hosted smart home running on Docker Compose. This repository is a full disa
 | Home Assistant | `ghcr.io/home-assistant/home-assistant:2026.2` | Core platform |
 | Zigbee2MQTT | `koenkk/zigbee2mqtt:2.8.0` | Zigbee coordinator (Sonoff 3.0 USB) |
 | Mosquitto | `eclipse-mosquitto:2.0` | MQTT broker |
-| nginx | `nginx:stable` | Security reverse proxy for Google Assistant OAuth *(disabled)* |
-| Cloudflared | `cloudflare/cloudflared` | External tunnel via `hassistant.destaben.dev` *(disabled)* |
+| nginx | `nginx:stable` | Security reverse proxy for Google Assistant OAuth *(not yet added)* |
+| Cloudflared | `cloudflare/cloudflared` | External tunnel via `hassistant.destaben.dev` *(not yet added)* |
 
-> nginx and cloudflared are currently commented out in `docker-compose.yaml`. See [#5](https://github.com/destaben/homeassistant/issues/5) to re-enable.
+> nginx and cloudflared are not yet added to `docker-compose.yaml`. See [#5](https://github.com/destaben/homeassistant/issues/5) to add and enable them.
 
 ## Repository Layout
 
@@ -32,8 +32,6 @@ homeassistant/              # HA config (bind-mounted to /config in container)
 data/                       # ⚠️ NOT versioned — Zigbee2MQTT state + network key
 mosquitto_config/           # Mosquitto static config (versioned)
 etc_mosquitto/              # ⚠️ NOT versioned — runtime certs/passwd
-nginx.conf                  # Reverse proxy config (versioned)
-cloudflared/config.yml      # Tunnel config (versioned)
 docker-compose.yaml         # All service definitions (versioned)
 .env.example                # Env var template — copy to .env
 .env                        # ⚠️ NOT versioned — Cloudflare tunnel token
@@ -135,6 +133,7 @@ See [GitHub Issues](https://github.com/destaben/homeassistant/issues) for the fu
 | [#14](https://github.com/destaben/homeassistant/issues/14) | AI Vision epic | 🤖 Epic |
 | [#15](https://github.com/destaben/homeassistant/issues/15) | Conversational AI epic | 🤖 Epic |
 | [#16](https://github.com/destaben/homeassistant/issues/16) | Agentic AI ReAct loop epic | 🤖 Epic |
+| [#17](https://github.com/destaben/homeassistant/issues/17) | Predictive ML automation epic | 🤖 Epic |
 
 ## Security Notes
 

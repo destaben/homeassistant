@@ -61,8 +61,6 @@ Self-hosted smart home infrastructure based on Home Assistant, Zigbee2MQTT, and 
 | `homeassistant/ui-lovelace.yaml` | Dashboard layout | UI/dashboard tasks |
 | `homeassistant/secrets.yaml.example` | Secret key reference | When configuring integrations |
 | `docker-compose.yaml` | Service definitions | Infrastructure tasks |
-| `nginx.conf` | Reverse proxy config | External access / OAuth tasks |
-| `cloudflared/config.yml` | Tunnel config | External access tasks |
 | `data/configuration.yaml` | Zigbee2MQTT config + device list | ZigBee device tasks |
 | `mosquitto_config/mosquitto.conf` | MQTT broker config | MQTT security tasks |
 
