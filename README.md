@@ -33,12 +33,14 @@ The tracked [GitHub Actions workflow](.github/workflows/validate.yml) runs YAML 
 
 Run the checks locally from the repository root:
 
+Docker commands on this host require `sudo`.
+
 ```bash
 pip install yamllint
 yamllint -c .yamllint.yml \
   ha/configuration.yaml ha/automations.yaml ha/scripts.yaml \
   ha/scenes.yaml ha/ui-lovelace.yaml
-docker compose config --quiet
+sudo docker compose config --quiet
 ```
 
 For HA-specific validation, also use **Developer Tools → YAML → Check configuration** in the target Home Assistant instance before restarting or reloading a production system. That live check cannot be run from this documentation review.
