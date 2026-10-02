@@ -31,4 +31,4 @@ meshtastic_public_broadcast:
     data:
       channel: meshtastic.gateway_d3st_channel_mediumfast
       message: "{{ message }}"
-      ack: true
+      ack: false
