@@ -22,6 +22,8 @@ nginx and Cloudflared are not defined in the tracked Compose file. Check the cur
 - [mosquitto/config/mosquitto.conf](mosquitto/config/mosquitto.conf) configures the broker to require a password file at `/etc/mosquitto/passwd`; Compose maps `mosquitto/certs/` to that container path.
 - [AGENTS.md](AGENTS.md) defines shared AI operating rules. Copilot context and repository agents/instructions are under `.github/`.
 - [`.github/agents/`](.github/agents/) contains focused workspace agents, [`.github/instructions/`](.github/instructions/) contains file-scoped guidance, and [`.github/skills/`](.github/skills/) contains reusable workflows. Use the Documentation Steward and AI Context Audit when reviewing repository documentation or AI context.
+- [`.github/prompts/`](.github/prompts/) contains entry points for automation delivery, presence design, security review, Assist/voice capability, dashboard work, and full repository reviews. The specialist tooling changes tracked files only after source verification and never deploys or performs live Home Assistant actions.
+- Use the [AI Vision Roadmap skill](.github/skills/ai-vision-roadmap/SKILL.md) for camera analysis, privacy constraints, and vision-driven automation planning.
 
 The Zigbee2MQTT data directory and live Home Assistant state are deployment data, not sources for repository documentation. Preserve them separately when planning a migration or disaster-recovery procedure. Do not infer their current contents or availability from this repository.
 
