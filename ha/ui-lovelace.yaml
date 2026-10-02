@@ -55,48 +55,6 @@ views:
             cards:
               - type: horizontal-stack
                 cards:
-                  - type: picture-entity
-                    entity: camera.tapo_camera_2f13_hd_stream
-                    camera_image: camera.tapo_camera_2f13_hd_stream
-                    show_name: false
-                    show_state: false
-                    tap_action:
-                      action: more-info
-              - type: horizontal-stack
-                cards:
-                  - type: button
-                    show_name: false
-                    show_icon: true
-                    tap_action:
-                      action: perform-action
-                      perform_action: script.move_camera_pasillo
-                      target: {}
-                    show_state: false
-                    icon: mdi:arrow-left
-                    icon_height: 30px
-                    style: |
-                      ha-card {
-                        width: 50%;
-                      }
-                  - type: button
-                    show_name: false
-                    show_icon: true
-                    tap_action:
-                      action: perform-action
-                      perform_action: script.move_camera_salon
-                      target: {}
-                    show_state: false
-                    icon: mdi:arrow-right
-                    icon_height: 30px
-                    style: |
-                      ha-card {
-                        width: 50%;
-                      }
-
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
                   - show_name: false
                     show_icon: true
                     type: button
@@ -210,13 +168,6 @@ views:
                     icon: mdi:printer-3d-nozzle
                     icon_height: 50px
                     entity: switch.plug_2
-              - type: picture-entity
-                entity: camera.tapo_camera_3ca0_hd_stream
-                camera_image: camera.tapo_camera_3ca0_hd_stream
-                show_name: false
-                show_state: false
-                tap_action:
-                  action: more-info
             title: Despacho
 
           - type: vertical-stack
@@ -273,88 +224,282 @@ views:
         name: Alarma
         tap_action:
           action: toggle
-  - title: Meshtastic d3st
-    path: meshtastic
-    icon: mdi:radio-handheld
+  - title: Móvil
+    path: movil
+    icon: mdi:cellphone
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: glance
+            show_name: false
+            show_icon: true
+            show_state: true
+            state_color: true
+            columns: 4
+            entities:
+              - entity: sensor.zhimi_mc2_8977_indoor_temperature
+              - entity: sensor.zhimi_mc2_8977_relative_humidity
+              - entity: sensor.zhimi_mc2_8977_pm25_density
+              - entity: binary_sensor.smoke_detector_smoke
+            layout_options:
+              grid_columns: full
+
+          - type: horizontal-stack
+            cards:
+              - type: tile
+                entity: person.carolmontaes
+                name: Carol
+                tap_action:
+                  action: more-info
+              - type: tile
+                entity: person.destaben
+                name: David
+                tap_action:
+                  action: more-info
+              - type: tile
+                entity: automation.alarm
+                name: Alarma
+                icon: mdi:alarm-light
+                tap_action:
+                  action: more-info
+
+      - type: grid
+        title: Mapa de limpieza
+        cards:
+          - type: custom:xiaomi-vacuum-map-card
+            map_source:
+              camera: camera.xiaomi_robot_vacuum_x20_map
+            calibration_source:
+              camera: true
+            entity: vacuum.xiaomi_robot_vacuum_x20
+            vacuum_platform: Xiaomi Miio
+            layout_options:
+              grid_columns: full
+
+          - type: tile
+            entity: vacuum.xiaomi_robot_vacuum_x20
+            name: Aspiradora
+            tap_action:
+              action: more-info
+            layout_options:
+              grid_columns: full
+
+      - type: grid
+        title: Estancias
+        columns: 2
+        cards:
+          - type: vertical-stack
+            title: Pasillo
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    entity: switch.light
+                    show_name: false
+                    show_state: true
+                    icon: mdi:lightbulb
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+                  - type: button
+                    entity: binary_sensor.motion_1_occupancy
+                    show_name: false
+                    show_state: true
+                    icon: mdi:motion-sensor
+                    icon_height: 34px
+                    tap_action:
+                      action: more-info
+                  - type: button
+                    entity: binary_sensor.door_1_contact
+                    show_name: false
+                    show_state: true
+                    icon: mdi:door
+                    icon_height: 34px
+                    tap_action:
+                      action: more-info
+
+          - type: vertical-stack
+            title: Salón
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    entity: switch.smart_plug_1909122087239425186448e1e9039bc1_outlet
+                    show_name: false
+                    show_state: true
+                    icon: mdi:power-plug
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+                  - type: button
+                    entity: fan.zhimi_mc2_8977_air_purifier
+                    show_name: false
+                    show_state: true
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+                  - type: button
+                    entity: remote.salon
+                    show_name: false
+                    show_state: true
+                    icon: mdi:television
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+                  - type: button
+                    entity: binary_sensor.window_1_contact
+                    show_name: false
+                    show_state: true
+                    icon: mdi:window-closed-variant
+                    icon_height: 34px
+                    tap_action:
+                      action: more-info
+
+          - type: vertical-stack
+            title: Dormitorio
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    entity: light.yeelink_color3_6f42_light
+                    show_name: false
+                    show_state: true
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+                  - type: button
+                    entity: remote.bedroom_tv
+                    show_name: false
+                    show_state: true
+                    icon: mdi:television
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+                  - type: button
+                    entity: binary_sensor.window_2_contact
+                    show_name: false
+                    show_state: true
+                    icon: mdi:window-closed-variant
+                    icon_height: 34px
+                    tap_action:
+                      action: more-info
+                  - type: button
+                    entity: media_player.dormitorio
+                    show_name: false
+                    show_state: true
+                    icon_height: 34px
+                    tap_action:
+                      action: more-info
+
+          - type: vertical-stack
+            title: Despacho
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    entity: switch.plug_1
+                    show_name: false
+                    show_state: true
+                    icon: mdi:power-plug
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+                  - type: button
+                    entity: media_player.despacho
+                    show_name: false
+                    show_state: true
+                    icon_height: 34px
+                    tap_action:
+                      action: more-info
+                  - type: button
+                    entity: switch.plug_2
+                    show_name: false
+                    show_state: true
+                    icon: mdi:printer-3d-nozzle
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+          - type: vertical-stack
+            title: Cocina
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    entity: switch.smart_plug_1909121534757325186448e1e903790b_outlet
+                    show_name: false
+                    show_state: true
+                    icon: mdi:power-plug
+                    icon_height: 34px
+                    tap_action:
+                      action: toggle
+                  - type: button
+                    entity: binary_sensor.presence_1_presence
+                    show_name: false
+                    show_state: true
+                    icon: mdi:account
+                    icon_height: 34px
+                    tap_action:
+                      action: more-info
+                  - type: button
+                    entity: binary_sensor.window_3_contact
+                    show_name: false
+                    show_state: true
+                    icon: mdi:window-closed-variant
+                    icon_height: 34px
+                    tap_action:
+                      action: more-info
+  - title: Cámaras
+    path: camaras
+    icon: mdi:camera
     type: sections
     max_columns: 2
     sections:
-      # ── Node status + channel (3-card row) ───────────────────────────────────
       - type: grid
-        title: Node d3st
-        column_span: 2
-        columns: 4
+        title: Pasillo y Salón
         cards:
-          - type: tile
-            entity: meshtastic.gateway_d3st
-            name: Gateway d3st
+          - type: picture-entity
+            entity: camera.tapo_camera_2f13_hd_stream
+            camera_image: camera.tapo_camera_2f13_hd_stream
+            show_name: false
+            show_state: false
+            tap_action:
+              action: more-info
+            layout_options:
+              grid_columns: full
+          - type: horizontal-stack
+            cards:
+              - type: button
+                show_name: false
+                show_icon: true
+                show_state: false
+                icon: mdi:arrow-left
+                icon_height: 34px
+                tap_action:
+                  action: perform-action
+                  perform_action: script.move_camera_pasillo
+                  target: {}
+              - type: button
+                show_name: false
+                show_icon: true
+                show_state: false
+                icon: mdi:arrow-right
+                icon_height: 34px
+                tap_action:
+                  action: perform-action
+                  perform_action: script.move_camera_salon
+                  target: {}
 
-          - type: tile
-            entity: sensor.d3st_canal_media_1h
-            name: Channel (1h avg)
-
-          - type: tile
-            entity: sensor.d3st_airtime_media_1h
-            name: Airtime (1h avg)
-
-          - type: tile
-            entity: sensor.d3st_nodes_online_media_1h
-            name: Nodes online (1h avg)
-
-      # ── Online nodes ──────────────────────────────────────────────────────────
       - type: grid
-        title: Network nodes
-        columns: 2
-        column_span: 2
+        title: Despacho
         cards:
-          - type: history-graph
-            title: Online nodes
-            hours_to_show: 360
-            entities:
-              - entity: sensor.meshtastic_d3st_2661074868_stats_nodes_online
-                name: Online
-
-          - type: statistics-graph
-            title: Channel
-            days_to_show: 15
-            period: day
-            stat_types:
-              - mean
-            entities:
-              - entity: sensor.meshtastic_d3st_2661074868_device_channel_utilization
-                name: Channel utilization
-              - entity: sensor.meshtastic_d3st_2661074868_device_airtime
-                name: Airtime TX
-
-      # ── Traffic — anomaly detection (rate of change, 5 min window) ───────────
-      - type: grid
-        title: Packet traffic
-        columns: 2
-        column_span: 2
-        cards:
-
-          - type: statistics-graph
-            title: Anomalies — daily max
-            days_to_show: 15
-            period: day
-            stat_types:
-              - max
-            entities:
-              - entity: sensor.d3st_tasa_errores_rf
-                name: RF errors/min
-              - entity: sensor.d3st_tasa_duplicados
-                name: Duplicates/min
-              - entity: sensor.d3st_tasa_relay_cancelado
-                name: Relay cancel./min
-
-          - type: statistics-graph
-            title: Traffic flow — daily mean
-            days_to_show: 15
-            period: day
-            stat_types:
-              - mean
-            entities:
-              - entity: sensor.d3st_tasa_rx
-                name: RX/min
-              - entity: sensor.d3st_tasa_tx
-                name: TX/min
+          - type: picture-entity
+            entity: camera.tapo_camera_3ca0_hd_stream
+            camera_image: camera.tapo_camera_3ca0_hd_stream
+            show_name: false
+            show_state: false
+            tap_action:
+              action: more-info
+            layout_options:
+              grid_columns: full
