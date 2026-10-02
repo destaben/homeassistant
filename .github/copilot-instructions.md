@@ -4,7 +4,7 @@
 
 This is a **self-hosted Home Assistant smart home** running on Docker Compose. The stack consists of:
 
-- **Home Assistant** (`ha/`) — core automation platform (v2026.2+)
+- **Home Assistant** (`ha/`) — core automation platform (v2026.9.4)
 - **Zigbee2MQTT** (`zigbee2mqtt/`) — Zigbee mesh coordinator via Sonoff 3.0 USB dongle
 - **Eclipse Mosquitto** (`mosquitto/config/`, `mosquitto/certs/`) — MQTT broker
 
@@ -25,7 +25,10 @@ mosquitto/
   config/               # Mosquitto static config
   certs/                # Runtime certs/passwd (gitignored)
 docker-compose.yaml     # All services definition
+.github/agents/         # Workspace custom agents, including documentation stewardship
 ```
+
+For shared AI operating rules, documentation ownership, and customization discovery, follow `AGENTS.md`. Use the Documentation Steward in `.github/agents/` for non-blocking documentation and AI-context maintenance.
 
 ## Key Conventions
 

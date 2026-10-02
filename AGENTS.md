@@ -19,12 +19,20 @@ Self-hosted smart home infrastructure based on Home Assistant, Zigbee2MQTT, and 
 - Before suggesting new automations, read `ha/automations.yaml` to understand existing patterns and avoid duplicates
 - This is a production system. Changes to `automations.yaml`, `configuration.yaml`, or `docker-compose.yaml` affect a live home — be conservative
 
+### Documentation and AI Context
+
+- For documentation, repository context, or AI customization work, consult or suggest the **Documentation Steward** in `.github/agents/documentation-steward.agent.md`; it is non-blocking and must not delay unrelated tasks
+- Keep AI-facing documentation, instructions, prompts, skills, and agent definitions in English, source-verified, and free of secrets
+- Treat tracked configuration files as the source of truth for operational facts; do not use ignored runtime data, logs, backups, or secrets as authoritative documentation sources
+- `AGENTS.md` owns shared AI operating rules, `.github/copilot-instructions.md` owns concise Copilot context, and `README.md` owns human-facing operational guidance
+- Before adding AI customization, search `.github/agents/`, `.github/instructions/`, `.github/prompts/`, and `.github/skills/` for an existing suitable capability
+
 ### Security (Non-Negotiable)
 
 - **Never** write secrets, API keys, tokens, or passwords to any tracked file
 - **Never** suggest removing `!secret` references in favour of inline values
 - **Never** modify `.gitignore` in ways that could expose `ha/secrets.yaml`, `.env`, or `zigbee2mqtt/`
-- When reviewing code, always flag: hardcoded credentials, `allow_anonymous true` in MQTT, unencrypted HTTP endpoints, `privileged: true` containers
+- When reviewing code, always flag: hardcoded credentials, `allow_anonymous true` in MQTT, unencrypted HTTP endpoints, `privileged: true`, broad capabilities, or weakened container security settings
 - If asked to generate a `secrets.yaml.example`, use placeholder values only — never real values
 
 ### YAML Generation

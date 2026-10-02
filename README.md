@@ -39,9 +39,12 @@ docker-compose.yaml         # All service definitions (versioned)
 AGENTS.md                   # AI agent rules and device reference
 .github/
   copilot-instructions.md   # GitHub Copilot workspace context
+  agents/                   # Workspace custom agents, including documentation stewardship
   workflows/validate.yml    # CI: yamllint + docker-compose + HA config check
   ISSUE_TEMPLATE/           # Bug, feature, security issue templates
 ```
+
+`AGENTS.md` defines shared AI operating rules. Workspace agents in `.github/agents/` provide focused, non-blocking workflows; use the Documentation Steward to audit or update documentation and AI-facing context.
 
 ## Disaster Recovery
 
