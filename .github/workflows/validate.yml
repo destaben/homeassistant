@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Write HA version file
-        run: echo "2026.2" > ha/.HA_VERSION
+        run: echo "2026.9.4" > ha/.HA_VERSION
 
       - name: Create dummy secrets.yaml for CI
         run: |

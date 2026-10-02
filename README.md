@@ -6,7 +6,7 @@ Self-hosted smart home running on Docker Compose. This repository is a full disa
 
 | Service | Image | Role |
 |---|---|---|
-| Home Assistant | `ghcr.io/home-assistant/home-assistant:2026.2` | Core platform |
+| Home Assistant | `ghcr.io/home-assistant/home-assistant:2026.9.4` | Core platform |
 | Zigbee2MQTT | `koenkk/zigbee2mqtt:2.8.0` | Zigbee coordinator (Sonoff 3.0 USB) |
 | Mosquitto | `eclipse-mosquitto:2.0` | MQTT broker |
 | nginx | `nginx:stable` | Security reverse proxy for Google Assistant OAuth *(not yet added)* |
