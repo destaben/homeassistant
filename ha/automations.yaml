@@ -200,6 +200,9 @@
   - service: switch.turn_off
     target:
       entity_id: switch.light
+  - condition: state
+    entity_id: binary_sensor.door_1_contact
+    state: 'off'
   - service: select.select_option
     target:
       entity_id: select.tapo_camera_2f13_move_to_preset

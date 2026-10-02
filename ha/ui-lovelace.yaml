@@ -236,9 +236,9 @@ views:
                     show_icon: true
                     type: button
                     tap_action:
-                      action: toggle
+                      action: more-info
                     entity: binary_sensor.presence_1_presence
-                    show_state: false
+                    show_state: true
                     icon: mdi:account
                     icon_height: 50px
                   - show_name: false
