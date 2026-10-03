@@ -425,7 +425,8 @@
   actions:
   - action: camera.snapshot
     metadata: {}
-    data: {}
+    data:
+      filename: /config/www/snapshots/alarm_{{ now().strftime('%Y%m%d_%H%M%S') }}.jpg
     target:
       device_id: 8e72263c49d90a31e36428bb6fbc4b52
 - id: b19af9c8d7734b5b99db56a0c6a14c0f
@@ -666,6 +667,7 @@
     data:
       option: Entrada
     action: select.select_option
+    continue_on_error: true
   - delay:
       seconds: 5
   - variables:
@@ -675,6 +677,7 @@
     data:
       filename: /config/www/snapshots/alarm_{{ snapshot_ts }}.jpg
     action: camera.snapshot
+    continue_on_error: true
   - delay:
       seconds: 2
   - data:
@@ -729,6 +732,10 @@
     entity_id:
     - sensor.david_iphone_battery_state
     - sensor.pixel_10a_battery_state
+    - binary_sensor.door_1_contact
+    - binary_sensor.window_1_contact
+    - binary_sensor.window_2_contact
+    - binary_sensor.window_3_contact
   conditions:
   - condition: time
     after: '21:30:00'
@@ -739,22 +746,23 @@
     entity_id: sensor.pixel_10a_battery_state
     state: Charging
   - condition: state
+    entity_id: person.destaben
+    state: home
+  - condition: state
+    entity_id: person.carolmontaes
+    state: home
+  - condition: state
     entity_id: automation.alarm
     state: 'off'
   actions:
   - choose:
     - conditions:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.window_1_contact
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.window_2_contact
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.window_3_contact
-          state: 'on'
+      - condition: template
+        value_template: >-
+          {{ states('binary_sensor.door_1_contact') != 'off'
+             or states('binary_sensor.window_1_contact') != 'off'
+             or states('binary_sensor.window_2_contact') != 'off'
+             or states('binary_sensor.window_3_contact') != 'off' }}
       sequence:
       - action: tts.speak
         target:
@@ -762,20 +770,30 @@
         data:
           media_player_entity_id: media_player.dormitorio
           message: >-
-            {% set rooms = namespace(names=[]) %}
+            {% set contacts = namespace(names=[]) %}
+            {% if states('binary_sensor.door_1_contact') == 'on' %}
+              {% set contacts.names = contacts.names + ['la puerta de entrada abierta'] %}
+            {% elif states('binary_sensor.door_1_contact') != 'off' %}
+              {% set contacts.names = contacts.names + ['el estado de la puerta de entrada no disponible'] %}
+            {% endif %}
             {% if is_state('binary_sensor.window_1_contact', 'on') %}
-              {% set rooms.names = rooms.names + ['Salon'] %}
+              {% set contacts.names = contacts.names + ['la ventana del Salon abierta'] %}
+            {% elif states('binary_sensor.window_1_contact') != 'off' %}
+              {% set contacts.names = contacts.names + ['el estado de la ventana del Salon no disponible'] %}
             {% endif %}
             {% if is_state('binary_sensor.window_2_contact', 'on') %}
-              {% set rooms.names = rooms.names + ['Dormitorio'] %}
+              {% set contacts.names = contacts.names + ['la ventana del Dormitorio abierta'] %}
+            {% elif states('binary_sensor.window_2_contact') != 'off' %}
+              {% set contacts.names = contacts.names + ['el estado de la ventana del Dormitorio no disponible'] %}
             {% endif %}
             {% if is_state('binary_sensor.window_3_contact', 'on') %}
-              {% set rooms.names = rooms.names + ['Cocina'] %}
+              {% set contacts.names = contacts.names + ['la ventana de la Cocina abierta'] %}
+            {% elif states('binary_sensor.window_3_contact') != 'off' %}
+              {% set contacts.names = contacts.names + ['el estado de la ventana de la Cocina no disponible'] %}
             {% endif %}
-            {% for room in rooms.names %}Tienes una ventana abierta en {{ room }}. {% endfor %}
-      - delay:
-          seconds: 8
-  - action: automation.turn_on
-    target:
-      entity_id: automation.alarm
+            No se arma la alarma: {{ contacts.names | join(', ') }}.
+    default:
+    - action: automation.turn_on
+      target:
+        entity_id: automation.alarm
   mode: single

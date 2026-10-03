@@ -41,7 +41,7 @@ The tracked [GitHub Actions workflow](.github/workflows/validate.yml) runs YAML 
 
 Run the checks locally from the repository root:
 
-Docker commands on this host require `sudo`.
+Run Docker commands with the permissions configured on the target host. Some hosts require `sudo`.
 
 ```bash
 pip install yamllint
@@ -58,6 +58,6 @@ For HA-specific validation, also use **Developer Tools → YAML → Check config
 - Keep credentials, MQTT password files, Zigbee network keys, and generated deployment state out of tracked files.
 - Use Home Assistant `!secret` references and placeholder-only examples.
 - The broker configuration disables anonymous access. Create its password file before starting the broker and configure clients with matching credentials; never put the passwords in this README or Compose file.
-- Back up Home Assistant state and Zigbee2MQTT data separately using a secure process appropriate to the deployment. This repository alone does not establish a complete restore procedure.
+- Follow the [disaster-recovery runbook](docs/disaster-recovery.md) to back up and restore the untracked deployment data. This repository alone is not a complete recovery source.
 
 For current incidents, priorities, and feature requests, consult the [GitHub Issues](https://github.com/destaben/homeassistant/issues) page directly.

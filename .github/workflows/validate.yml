@@ -7,6 +7,9 @@ on:
     paths:
       - "ha/**/*.yaml"
       - "docker-compose.yaml"
+      - "mosquitto/config/mosquitto.conf"
+      - ".yamllint.yml"
+      - ".github/workflows/validate.yml"
 
 jobs:
   yaml-lint:
@@ -33,12 +36,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create dummy .env
-        run: |
-          echo "CLOUDFLARE_TUNNEL_TOKEN=dummy_token_for_ci" > .env
-
       - name: Validate docker-compose.yaml
         run: docker compose config --quiet
+
+  mosquitto-policy:
+    name: Mosquitto Policy Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify broker authentication policy
+        run: |
+          grep -Fx "allow_anonymous false" mosquitto/config/mosquitto.conf
+          grep -Eq "^password_file /etc/mosquitto/passwd$" mosquitto/config/mosquitto.conf
 
   ha-config-check:
     name: Home Assistant Config Check
