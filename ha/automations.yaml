@@ -193,22 +193,26 @@
   trigger:
   - platform: state
     entity_id: binary_sensor.door_1_contact
-    to: 'off'
   condition: []
   action:
-  - delay: 00:05:00
-  - service: switch.turn_off
-    target:
-      entity_id: switch.light
-  - condition: state
-    entity_id: binary_sensor.door_1_contact
-    state: 'off'
-  - service: select.select_option
-    target:
-      entity_id: select.tapo_camera_2f13_move_to_preset
-    data:
-      option: Salon
-  mode: single
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ trigger.to_state.state == 'off' }}"
+      sequence:
+      - delay: 00:05:00
+      - condition: state
+        entity_id: binary_sensor.door_1_contact
+        state: 'off'
+      - service: switch.turn_off
+        target:
+          entity_id: switch.light
+      - service: select.select_option
+        target:
+          entity_id: select.tapo_camera_2f13_move_to_preset
+        data:
+          option: Salon
+  mode: restart
   id: f0e711f057db4b72850b3741be494c25
 - id: 322664906974422b8bf0ab904808cf82
   alias: entry.motion
@@ -380,21 +384,23 @@
   trigger:
   - platform: time
     at: '10:00:00'
+  variables:
+    low_battery_devices: >-
+      {% set devices = namespace(names=[]) %}
+      {% for entity in states.sensor if 'battery' in entity.entity_id %}
+        {% if entity.state.isdigit() and entity.state | int < 5 %}
+          {% set devices.names = devices.names + [entity.attributes.friendly_name | default(entity.entity_id)] %}
+        {% endif %}
+      {% endfor %}
+      {{ devices.names | join(', ') }}
   condition:
   - condition: template
-    value_template: "{%- set low_battery_devices = [] -%} {%- for entity in states.sensor
-      if 'battery' in entity.entity_id -%}\n  {%- if entity.state.isdigit() and entity.state
-      | int < 5 -%}\n    {%- set low_battery_devices = low_battery_devices + [entity.attributes.friendly_name
-      | default(entity.entity_id)] -%}\n  {%- endif -%}\n{%- endfor -%} {{ low_battery_devices
-      | length > 0 }}\n"
+    value_template: "{{ low_battery_devices | length > 0 }}"
   action:
   - service: notify.mobile_app_davids_iphone
-    data_template:
+    data:
       title: Batería baja
-      message: 'Los siguientes dispositivos tienen menos del 5% de batería: {{ low_battery_devices
-        | join('', '') }}
-
-        '
+      message: "Los siguientes dispositivos tienen menos del 5% de batería: {{ low_battery_devices }}"
   mode: single
   id: c5d2eeccc80540cfad550173a4dbf029
 - id: 0f735305405f47889c1bf8f9b55c7a91
