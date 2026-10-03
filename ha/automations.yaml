@@ -403,6 +403,16 @@
       message: "Los siguientes dispositivos tienen menos del 5% de batería: {{ low_battery_devices }}"
   mode: single
   id: c5d2eeccc80540cfad550173a4dbf029
+- id: snapshots_alarm_retention
+  alias: snapshots.alarm_retention
+  description: Remove only alarm snapshots older than 30 days.
+  triggers:
+  - trigger: time
+    at: "03:15:00"
+  conditions: []
+  actions:
+  - action: shell_command.cleanup_alarm_snapshots
+  mode: single
 - id: 0f735305405f47889c1bf8f9b55c7a91
   alias: alarm
   triggers:

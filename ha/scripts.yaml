@@ -32,3 +32,21 @@ meshtastic_public_broadcast:
       channel: meshtastic.gateway_d3st_channel_mediumfast
       message: "{{ message }}"
       ack: false
+vacuum_clean_all_or_return:
+  alias: vacuum_clean_all_or_return
+  mode: single
+  sequence:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: >-
+          {{ states('vacuum.xiaomi_robot_vacuum_x20') in
+             ['cleaning', 'paused', 'returning'] }}
+      sequence:
+      - action: vacuum.return_to_base
+        target:
+          entity_id: vacuum.xiaomi_robot_vacuum_x20
+    default:
+    - action: vacuum.start
+      target:
+        entity_id: vacuum.xiaomi_robot_vacuum_x20
