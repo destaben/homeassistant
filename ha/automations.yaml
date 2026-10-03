@@ -646,7 +646,7 @@
             volume: 1.0
         notification_icon: mdi:alarm-light
         color: red
-    action: notify.mobile_app_sm_a346b
+    action: notify.pixel_10a
   mode: single
 - id: meshtastic_public_broadcast_event
   alias: meshtastic.public_broadcast_event
@@ -659,4 +659,46 @@
   - action: script.meshtastic_public_broadcast
     data:
       message: "{{ trigger.event.data.message }}"
+  mode: single
+- id: d25a43d39e9a497f8c86a0b8be1fcf9f
+  alias: night.windows_open_charge_reminder
+  triggers:
+  - entity_id: sensor.david_iphone_battery_state
+    to: Charging
+    trigger: state
+  conditions:
+  - condition: time
+    after: '21:30:00'
+  - condition: state
+    entity_id: sensor.david_iphone_battery_state
+    state: Charging
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.window_1_contact
+      state: 'on'
+    - condition: state
+      entity_id: binary_sensor.window_2_contact
+      state: 'on'
+    - condition: state
+      entity_id: binary_sensor.window_3_contact
+      state: 'on'
+  actions:
+  - action: tts.speak
+    target:
+      entity_id: tts.despacho_google_translate
+    data:
+      media_player_entity_id: media_player.dormitorio
+      message: >-
+        {% set rooms = namespace(names=[]) %}
+        {% if is_state('binary_sensor.window_1_contact', 'on') %}
+          {% set rooms.names = rooms.names + ['Salon'] %}
+        {% endif %}
+        {% if is_state('binary_sensor.window_2_contact', 'on') %}
+          {% set rooms.names = rooms.names + ['Dormitorio'] %}
+        {% endif %}
+        {% if is_state('binary_sensor.window_3_contact', 'on') %}
+          {% set rooms.names = rooms.names + ['Cocina'] %}
+        {% endif %}
+        {% for room in rooms.names %}Tienes una ventana abierta en {{ room }}. {% endfor %}
   mode: single
