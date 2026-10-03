@@ -29,9 +29,11 @@ The Zigbee2MQTT data directory and live Home Assistant state are deployment data
 
 ## Dashboard Conventions
 
-The YAML dashboard uses a sections layout organized by room. Keep room controls compact and use familiar Material Design icons; presence and occupancy indicators use `mdi:motion-sensor` consistently. Controls that change a device state use a direct toggle only when the effect is clear, while sensors and navigation targets open their details with `more-info`.
+The YAML dashboard uses one sections-based Casa view organized by room. Keep room controls compact and use familiar Material Design icons; presence and occupancy indicators use `mdi:motion-sensor` consistently. Controls that change a device state use a direct toggle only when the effect is clear, while sensors and navigation targets open their details with `more-info`.
 
-For the vacuum, the **Estancias** control opens the native area selector and **Casa completa** runs the tracked script that starts a whole-home clean or sends an active vacuum back to its base. Preserve these explicit labels and actions when changing the dashboard.
+For the vacuum, the **Estancias** control opens the native area selector and **Casa completa** runs the tracked script that starts a whole-home clean or sends an active vacuum back to its base. Camera controls belong with their rooms: the `mdi:cctv` buttons open a Browser Mod popup with the stream under demand. Preserve these explicit labels and actions when changing the dashboard.
+
+Browser Mod is installed locally as a custom integration through HACS or `ha/custom_components/browser_mod/`, which is intentionally ignored by Git. After installing or updating it, restart Home Assistant, add **Browser Mod** in **Settings → Devices & Services**, restart once more, and register the browser in its Browser Mod panel before testing camera popups. This runtime setup is not established by the tracked YAML alone.
 
 ## Validation
 

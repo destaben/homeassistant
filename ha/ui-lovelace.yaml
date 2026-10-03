@@ -1,7 +1,6 @@
 title: Home
 views:
-  - title: Casa
-    path: sections
+  - path: sections
     icon: mdi:home
     type: sections
     max_columns: 1
@@ -135,6 +134,42 @@ views:
                     icon_height: 34px
                     tap_action:
                       action: more-info
+                  - type: button
+                    entity: camera.tapo_camera_2f13_hd_stream
+                    show_name: false
+                    show_state: false
+                    icon: mdi:cctv
+                    icon_height: 34px
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: Cámara Salón
+                          content:
+                            type: vertical-stack
+                            cards:
+                              - type: picture-entity
+                                entity: camera.tapo_camera_2f13_hd_stream
+                                camera_image: camera.tapo_camera_2f13_hd_stream
+                                show_name: false
+                                show_state: false
+                              - type: horizontal-stack
+                                cards:
+                                  - type: button
+                                    name: Entrada
+                                    icon: mdi:door
+                                    tap_action:
+                                      action: perform-action
+                                      perform_action: script.move_camera_pasillo
+                                      target: {}
+                                  - type: button
+                                    name: Salón
+                                    icon: mdi:sofa
+                                    tap_action:
+                                      action: perform-action
+                                      perform_action: script.move_camera_salon
+                                      target: {}
 
           - type: vertical-stack
             title: Dormitorio
@@ -200,6 +235,24 @@ views:
                     icon_height: 34px
                     tap_action:
                       action: toggle
+                  - type: button
+                    entity: camera.tapo_camera_3ca0_hd_stream
+                    show_name: false
+                    show_state: false
+                    icon: mdi:cctv
+                    icon_height: 34px
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: Cámara Despacho
+                          content:
+                            type: picture-entity
+                            entity: camera.tapo_camera_3ca0_hd_stream
+                            camera_image: camera.tapo_camera_3ca0_hd_stream
+                            show_name: false
+                            show_state: false
           - type: vertical-stack
             title: Cocina
             cards:
@@ -229,73 +282,3 @@ views:
                     icon_height: 34px
                     tap_action:
                       action: more-info
-  - title: Limpieza
-    path: limpieza
-    icon: mdi:robot-vacuum
-    type: sections
-    max_columns: 2
-    sections:
-      - type: grid
-        title: Aspiradora
-        cards:
-          - type: custom:xiaomi-vacuum-map-card
-            map_source:
-              camera: camera.xiaomi_robot_vacuum_x20_map
-            calibration_source:
-              camera: true
-            entity: vacuum.xiaomi_robot_vacuum_x20
-            vacuum_platform: Xiaomi Miio
-            layout_options:
-              grid_columns: full
-          - type: tile
-            entity: vacuum.xiaomi_robot_vacuum_x20
-            name: Aspiradora
-            tap_action:
-              action: more-info
-            layout_options:
-              grid_columns: full
-  - title: Cámaras
-    path: camaras
-    icon: mdi:camera
-    type: sections
-    max_columns: 2
-    sections:
-      - type: grid
-        title: Pasillo y Salón
-        cards:
-          - type: tile
-            entity: camera.tapo_camera_2f13_hd_stream
-            name: Ver cámara
-            tap_action:
-              action: more-info
-          - type: horizontal-stack
-            cards:
-              - type: button
-                show_name: false
-                show_icon: true
-                show_state: false
-                icon: mdi:arrow-left
-                icon_height: 34px
-                tap_action:
-                  action: perform-action
-                  perform_action: script.move_camera_pasillo
-                  target: {}
-              - type: button
-                show_name: false
-                show_icon: true
-                show_state: false
-                icon: mdi:arrow-right
-                icon_height: 34px
-                tap_action:
-                  action: perform-action
-                  perform_action: script.move_camera_salon
-                  target: {}
-
-      - type: grid
-        title: Despacho
-        cards:
-          - type: tile
-            entity: camera.tapo_camera_3ca0_hd_stream
-            name: Ver cámara
-            tap_action:
-              action: more-info
