@@ -31,6 +31,9 @@ lovelace:
 api:
 logbook:
 history:
+recorder:
+  auto_purge: true
+  purge_keep_days: 14
 
 assist_pipeline:
 
