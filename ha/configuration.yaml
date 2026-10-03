@@ -35,6 +35,9 @@ recorder:
   auto_purge: true
   purge_keep_days: 14
 
+shell_command:
+  cleanup_alarm_snapshots: "find /config/www/snapshots -maxdepth 1 -type f -name 'alarm_*.jpg' -mtime +30 -delete"
+
 assist_pipeline:
 
 automation: !include automations.yaml

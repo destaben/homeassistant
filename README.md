@@ -27,6 +27,12 @@ nginx and Cloudflared are not defined in the tracked Compose file. Check the cur
 
 The Zigbee2MQTT data directory and live Home Assistant state are deployment data, not sources for repository documentation. Preserve them separately when planning a migration or disaster-recovery procedure. Do not infer their current contents or availability from this repository.
 
+## Dashboard Conventions
+
+The YAML dashboard uses a sections layout organized by room. Keep room controls compact and use familiar Material Design icons; presence and occupancy indicators use `mdi:motion-sensor` consistently. Controls that change a device state use a direct toggle only when the effect is clear, while sensors and navigation targets open their details with `more-info`.
+
+For the vacuum, the **Estancias** control opens the native area selector and **Casa completa** runs the tracked script that starts a whole-home clean or sends an active vacuum back to its base. Preserve these explicit labels and actions when changing the dashboard.
+
 ## Validation
 
 The tracked [GitHub Actions workflow](.github/workflows/validate.yml) runs YAML linting, Docker Compose validation, and a Home Assistant configuration check. The Home Assistant check is explicitly allowed to fail because device-registry references may not resolve outside the live instance; treat it as advisory, not as a passing guarantee. Pull-request runs are path-filtered to HA YAML and `docker-compose.yaml`; pushes to `main` or `master` trigger the workflow.
