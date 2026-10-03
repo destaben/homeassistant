@@ -21,51 +21,36 @@ views:
             layout_options:
               grid_columns: full
 
-          - type: horizontal-stack
+          - type: vertical-stack
             cards:
-              - type: tile
-                entity: person.carolmontaes
-                name: Carol
-                tap_action:
-                  action: more-info
-              - type: tile
-                entity: person.destaben
-                name: David
-                tap_action:
-                  action: more-info
-              - type: tile
-                entity: automation.alarm
-                name: Alarma
-                icon: mdi:alarm-light
-                tap_action:
-                  action: more-info
+              - type: horizontal-stack
+                cards:
+                  - type: tile
+                    entity: person.carolmontaes
+                    name: Carol
+                    tap_action:
+                      action: more-info
+                  - type: tile
+                    entity: person.destaben
+                    name: David
+                    tap_action:
+                      action: more-info
+              - type: horizontal-stack
+                cards:
+                  - type: tile
+                    entity: automation.alarm
+                    name: Alarma
+                    icon: mdi:alarm-light
+                    tap_action:
+                      action: more-info
+                  - type: tile
+                    entity: vacuum.xiaomi_robot_vacuum_x20
+                    name: Limpieza
+                    icon: mdi:floor-plan
+                    tap_action:
+                      action: more-info
 
       - type: grid
-        title: Limpieza
-        cards:
-          - type: horizontal-stack
-            cards:
-              - type: button
-                entity: vacuum.xiaomi_robot_vacuum_x20
-                name: Estancias
-                show_state: false
-                icon: mdi:floor-plan
-                icon_height: 34px
-                tap_action:
-                  action: more-info
-              - type: button
-                entity: vacuum.xiaomi_robot_vacuum_x20
-                name: Casa completa
-                show_state: false
-                icon: mdi:broom
-                icon_height: 34px
-                tap_action:
-                  action: perform-action
-                  perform_action: script.vacuum_clean_all_or_return
-                  target: {}
-
-      - type: grid
-        title: Estancias
         columns: 2
         cards:
           - type: vertical-stack
