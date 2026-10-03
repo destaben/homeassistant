@@ -428,6 +428,50 @@
     data: {}
     target:
       device_id: 8e72263c49d90a31e36428bb6fbc4b52
+- id: b19af9c8d7734b5b99db56a0c6a14c0f
+  alias: alarm.enabled_announcement
+  triggers:
+  - trigger: state
+    entity_id: automation.alarm
+    from: 'off'
+    to: 'on'
+  conditions: []
+  actions:
+  - action: tts.speak
+    target:
+      entity_id: tts.despacho_google_translate
+    data:
+      media_player_entity_id: media_player.dormitorio
+      message: Alarma activada
+  - action: tts.speak
+    target:
+      entity_id: tts.despacho_google_translate
+    data:
+      media_player_entity_id: media_player.despacho
+      message: Alarma activada
+  mode: single
+- id: 0bdc86c41a0849a3b72cfe5b1d7a8302
+  alias: alarm.disabled_announcement
+  triggers:
+  - trigger: state
+    entity_id: automation.alarm
+    from: 'on'
+    to: 'off'
+  conditions: []
+  actions:
+  - action: tts.speak
+    target:
+      entity_id: tts.despacho_google_translate
+    data:
+      media_player_entity_id: media_player.dormitorio
+      message: Alarma desactivada
+  - action: tts.speak
+    target:
+      entity_id: tts.despacho_google_translate
+    data:
+      media_player_entity_id: media_player.despacho
+      message: Alarma desactivada
+  mode: single
 - alias: tag.ordenador.switch
   mode: single
   trigger:
@@ -677,44 +721,61 @@
       message: "{{ trigger.event.data.message }}"
   mode: single
 - id: d25a43d39e9a497f8c86a0b8be1fcf9f
-  alias: night.windows_open_charge_reminder
+  alias: night.arm_alarm_when_phones_charging
   triggers:
-  - entity_id: sensor.david_iphone_battery_state
-    to: Charging
-    trigger: state
+  - trigger: time
+    at: '21:30:00'
+  - trigger: state
+    entity_id:
+    - sensor.david_iphone_battery_state
+    - sensor.pixel_10a_battery_state
   conditions:
   - condition: time
     after: '21:30:00'
   - condition: state
     entity_id: sensor.david_iphone_battery_state
     state: Charging
-  - condition: or
-    conditions:
-    - condition: state
-      entity_id: binary_sensor.window_1_contact
-      state: 'on'
-    - condition: state
-      entity_id: binary_sensor.window_2_contact
-      state: 'on'
-    - condition: state
-      entity_id: binary_sensor.window_3_contact
-      state: 'on'
+  - condition: state
+    entity_id: sensor.pixel_10a_battery_state
+    state: Charging
+  - condition: state
+    entity_id: automation.alarm
+    state: 'off'
   actions:
-  - action: tts.speak
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.window_1_contact
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.window_2_contact
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.window_3_contact
+          state: 'on'
+      sequence:
+      - action: tts.speak
+        target:
+          entity_id: tts.despacho_google_translate
+        data:
+          media_player_entity_id: media_player.dormitorio
+          message: >-
+            {% set rooms = namespace(names=[]) %}
+            {% if is_state('binary_sensor.window_1_contact', 'on') %}
+              {% set rooms.names = rooms.names + ['Salon'] %}
+            {% endif %}
+            {% if is_state('binary_sensor.window_2_contact', 'on') %}
+              {% set rooms.names = rooms.names + ['Dormitorio'] %}
+            {% endif %}
+            {% if is_state('binary_sensor.window_3_contact', 'on') %}
+              {% set rooms.names = rooms.names + ['Cocina'] %}
+            {% endif %}
+            {% for room in rooms.names %}Tienes una ventana abierta en {{ room }}. {% endfor %}
+      - delay:
+          seconds: 8
+  - action: automation.turn_on
     target:
-      entity_id: tts.despacho_google_translate
-    data:
-      media_player_entity_id: media_player.dormitorio
-      message: >-
-        {% set rooms = namespace(names=[]) %}
-        {% if is_state('binary_sensor.window_1_contact', 'on') %}
-          {% set rooms.names = rooms.names + ['Salon'] %}
-        {% endif %}
-        {% if is_state('binary_sensor.window_2_contact', 'on') %}
-          {% set rooms.names = rooms.names + ['Dormitorio'] %}
-        {% endif %}
-        {% if is_state('binary_sensor.window_3_contact', 'on') %}
-          {% set rooms.names = rooms.names + ['Cocina'] %}
-        {% endif %}
-        {% for room in rooms.names %}Tienes una ventana abierta en {{ room }}. {% endfor %}
+      entity_id: automation.alarm
   mode: single
