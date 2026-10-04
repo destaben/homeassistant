@@ -8,6 +8,7 @@ Shared safety rules and source ownership are in [AGENTS.md](../AGENTS.md). This 
 - [ha/configuration.yaml](../ha/configuration.yaml) is the Home Assistant entry point. It includes automations and scripts and currently declares `assist_pipeline:`.
 - [mosquitto/config/mosquitto.conf](../mosquitto/config/mosquitto.conf) disables anonymous access and requires a password file. Never document or expose credential values.
 - [.github/workflows/validate.yml](workflows/validate.yml) is the source of truth for automated validation and its triggers.
+- [Home Configuration Map](home-configuration-map.md) summarizes the source-backed functional relationships among configured entities, automations, scripts, MQTT, and dashboard workflows. It is not a live inventory or recorder-history source.
 
 ## Working Rules
 
