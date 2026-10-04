@@ -41,17 +41,37 @@ The tracked [GitHub Actions workflow](.github/workflows/validate.yml) runs YAML 
 
 Run the checks locally from the repository root:
 
-Run Docker commands with the permissions configured on the target host. Some hosts require `sudo`.
+On this host, run Docker commands as a user in the `docker` group with `docker context show` set to `default`.
 
 ```bash
 pip install yamllint
 yamllint -c .yamllint.yml \
   ha/configuration.yaml ha/automations.yaml ha/scripts.yaml \
   ha/scenes.yaml ha/ui-lovelace.yaml
-sudo docker compose config --quiet
+docker compose config --quiet
 ```
 
 For HA-specific validation, also use **Developer Tools → YAML → Check configuration** in the target Home Assistant instance before restarting or reloading a production system. That live check cannot be run from this documentation review.
+
+## Redeployment
+
+Run the operational scripts from the repository root on the deployment host. They require a user in the `docker` group with `docker context show` set to `default`, never print deployment secrets, and do not run `docker compose down`.
+
+```bash
+./scripts/preflight.sh
+./scripts/deploy.sh
+./scripts/verify.sh
+```
+
+`deploy.sh` accepts an optional, allowlisted service list, for example `./scripts/deploy.sh mosquitto`. It validates that this repository owns the active Home Assistant container before recreating any service. It does not migrate data; use the migration runbook and preserve the complete `ha/`, `zigbee2mqtt/`, and Mosquitto runtime directories first.
+
+To deploy an earlier tracked revision, start from a clean worktree and use:
+
+```bash
+./scripts/rollback.sh --confirm <git-ref>
+```
+
+The rollback changes only the checked-out tracked configuration and recreates the services. It does not restore runtime state. Never start another Home Assistant or Zigbee2MQTT instance against the production USB coordinator while this stack is running.
 
 ## Credentials and Recovery
 
