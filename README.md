@@ -41,7 +41,7 @@ The tracked [GitHub Actions workflow](.github/workflows/validate.yml) runs YAML 
 
 Run the checks locally from the repository root:
 
-Run Docker commands with the permissions configured on the target host. Some hosts require `sudo`.
+On this host, run Docker commands as a user in the `docker` group with `docker context show` set to `default`.
 
 ```bash
 pip install yamllint
