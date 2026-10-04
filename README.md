@@ -65,14 +65,6 @@ Run the operational scripts from the repository root on the deployment host. The
 
 `deploy.sh` accepts an optional, allowlisted service list, for example `./scripts/deploy.sh mosquitto`. It validates that this repository owns the active Home Assistant container before recreating any service. It does not migrate data; use the migration runbook and preserve the complete `ha/`, `zigbee2mqtt/`, and Mosquitto runtime directories first.
 
-The first move to `/opt/homeassistant` is a planned cutover. It creates a compressed backup under `/opt/migration-backups`, stops the source stack, copies the complete runtime state with ownership, ACLs and extended attributes, and starts the same Compose project from `/opt`. It restores the source stack automatically if the target cannot start.
-
-```bash
-./scripts/cutover.sh --confirm
-```
-
-To return to the source deployment, including runtime changes made after the cutover, use `./scripts/rollback-cutover.sh --confirm`. It backs up the current `/opt` state, synchronizes it to the source directories, and starts the original Compose project.
-
 To deploy an earlier tracked revision, start from a clean worktree and use:
 
 ```bash
