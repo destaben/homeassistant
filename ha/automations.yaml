@@ -739,12 +739,12 @@
   conditions:
   - condition: time
     after: '21:30:00'
-  - condition: state
-    entity_id: sensor.david_iphone_battery_state
-    state: Charging
-  - condition: state
-    entity_id: sensor.pixel_10a_battery_state
-    state: Charging
+  - condition: template
+    value_template: >-
+      {{ states('sensor.david_iphone_battery_state') | lower == 'charging' }}
+  - condition: template
+    value_template: >-
+      {{ states('sensor.pixel_10a_battery_state') | lower == 'charging' }}
   - condition: state
     entity_id: person.destaben
     state: home

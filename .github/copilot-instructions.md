@@ -15,5 +15,6 @@ Shared safety rules and source ownership are in [AGENTS.md](../AGENTS.md). This 
 - Follow existing YAML syntax in the target file. For automation-specific guidance, see [home-assistant-automations.instructions.md](instructions/home-assistant-automations.instructions.md).
 - Treat configuration changes as production-impacting. Do not restart or alter a live deployment unless explicitly requested.
 - Do not assume integrations, entity registries, issue status, or deployment state from repository context. Check the live source or mark the fact unverified.
+- Use the [Home Operations Diagnostician](agents/home-operations-diagnostician.agent.md) for bounded, read-only live incident and troubleshooting evidence. Its exception does not permit deployment, service calls, device control, or secret inspection.
 - For documentation and AI-context work, the [Documentation Steward](agents/documentation-steward.agent.md) is available and non-blocking.
 - Use the [AI Context Audit](skills/ai-context-audit/SKILL.md) skill for a repeatable documentation and customization review.

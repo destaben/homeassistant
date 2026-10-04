@@ -11,6 +11,15 @@ This file defines shared rules for AI agents working on the tracked configuratio
 - Never modify `.gitignore` in a way that could expose secret or runtime files.
 - When reviewing infrastructure, flag hardcoded credentials, anonymous MQTT access, insecure network exposure, excessive container privileges/capabilities, and weakened security settings.
 
+## Live Diagnostic Exception
+
+The Home Operations Diagnostician may inspect live deployment data only to answer a specific diagnostic question. This exception permits bounded, read-only checks of Docker/container health, entity and automation state, event/history data, recorder data, and sanitized logs for the configured `homeassistant`, `zigbee2mqtt`, and `mosquitto` containers. It does not make runtime data a source for documentation or configuration claims.
+
+- Use the minimum data and shortest time range needed; redact credentials, tokens, authentication headers, and unrelated sensitive household data.
+- Discover a recorder backend, database path, schema, and available tools through read-only probes. Query recorder data only with bounded `SELECT` statements; do not export, copy, alter, or repair it.
+- Never inspect secrets, credential files, token-bearing configuration, backups, camera media, or unrestricted logs.
+- Never call Home Assistant services, publish MQTT messages, change container or host state, reload/restart/deploy services, or modify persistent data. Route requested changes to the appropriate implementation and security-review workflow.
+
 ## Source of Truth
 
 Use tracked configuration for operational facts and distinguish configured behavior from live deployment state.
@@ -43,6 +52,7 @@ The Zigbee2MQTT runtime configuration and live Home Assistant state are not auth
 - Use the [AI Context Audit](.github/skills/ai-context-audit/SKILL.md) skill for a repeatable review of documentation and AI customizations.
 - Use the [Home Automation Orchestrator](.github/agents/home-automation-orchestrator.agent.md) to route multi-domain home changes through the appropriate specialist. Its workflow is advisory until an implementation task is explicitly delegated.
 - Use specialized agents for automation engineering, presence design, security review, Assist/voice, and Lovelace work. Security and presence specialists are read-only. Configuration write ownership is scoped: the Home Assistant Engineer handles general Home Assistant and infrastructure configuration, the Assist Experience Designer handles Assist/voice configuration, and the Lovelace Dashboard Engineer handles `ha/ui-lovelace.yaml`. The Documentation Steward edits documentation and AI customizations only.
+- The [Home Operations Diagnostician](.github/agents/home-operations-diagnostician.agent.md) is the only agent authorized for the Live Diagnostic Exception. It performs live reads only and does not own configuration changes or operational actions.
 - Reusable workflows are available in `.github/skills/`; common entry points are in `.github/prompts/`. Choose the narrowest agent, skill, or prompt that fits the request.
 - Load context progressively: start with the target tracked file and its matching file instruction, then add the relevant skill and specialist only when the request crosses that concern. Do not load the full toolkit for a focused edit.
 - Every specialist handoff must state the scope, tracked sources reviewed, verified references, unresolved facts, safety constraints, and the validation required. A missing live-state fact creates a deferred check, not a blocker for unrelated tracked-file work.
