@@ -55,7 +55,7 @@ For HA-specific validation, also use **Developer Tools → YAML → Check config
 
 ## Redeployment
 
-Run the operational scripts from the repository root on the deployment host. They require a user in the `docker` group with `docker context show` set to `default`, never print deployment secrets, and do not run `docker compose down`.
+The tracked source checkout belongs at `/opt/src/homeassistant`; the live runtime belongs at `/opt/homeassistant`. Run the operational scripts from the source checkout on the deployment host. They require a user in the `docker` group with `docker context show` set to `default`, never print deployment secrets, and do not run `docker compose down`.
 
 ```bash
 ./scripts/preflight.sh
