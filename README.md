@@ -54,25 +54,39 @@ docker compose config --quiet
 
 For HA-specific validation, also use **Developer Tools → YAML → Check configuration** in the target Home Assistant instance before restarting or reloading a production system. That live check cannot be run from this documentation review.
 
-## Redeployment
+## Clean Host Recovery and Operation
 
-The tracked source checkout belongs at `/opt/src/homeassistant`; the live runtime belongs at `/opt/homeassistant`. Run the operational scripts from the source checkout on the deployment host. They require a user in the `docker` group with `docker context show` set to `default`, never print deployment secrets, and do not run `docker compose down`.
-
-```bash
-./scripts/preflight.sh
-./scripts/deploy.sh
-./scripts/verify.sh
-```
-
-`deploy.sh` accepts an optional, allowlisted service list, for example `./scripts/deploy.sh mosquitto`. It validates that this repository owns the active Home Assistant container before recreating any service. It does not migrate data; use the migration runbook and preserve the complete `ha/`, `zigbee2mqtt/`, and Mosquitto runtime directories first.
-
-To deploy an earlier tracked revision, start from a clean worktree and use:
+The supported recovery layout uses one checkout at `/opt/homeassistant`. Clone the
+approved revision there, restore the ignored runtime directories and secret
+material from approved encrypted backups, then validate and start Compose from
+that same checkout. Do not use a separate source checkout or copy the Compose
+file into a second runtime directory.
 
 ```bash
-./scripts/rollback.sh --confirm <git-ref>
+git clone https://github.com/destaben/homeassistant.git /opt/homeassistant
+cd /opt/homeassistant
+# Restore the approved private runtime material before continuing.
+pip install yamllint
+yamllint -c .yamllint.yml \
+  ha/configuration.yaml ha/automations.yaml ha/scripts.yaml \
+  ha/scenes.yaml ha/ui-lovelace.yaml
+docker compose config --quiet
+docker compose pull
+docker compose up -d
+docker compose ps
 ```
 
-The rollback changes only the checked-out tracked configuration and recreates the services. It does not restore runtime state. Never start another Home Assistant or Zigbee2MQTT instance against the production USB coordinator while this stack is running.
+Run these commands only on a replacement host after the recovery procedure has
+verified the coordinator and network cutover. Never start a second Home
+Assistant or Zigbee2MQTT instance against the production coordinator or Zigbee
+network.
+
+For a normal configuration update, review the change in the same checkout, run
+the validation commands above, then use `docker compose pull` and `docker
+compose up -d`. To use an earlier tracked configuration, check out the approved
+Git revision in a clean worktree and repeat the validation and Compose commands.
+Neither approach restores runtime data; use the recovery runbook when data must
+be restored.
 
 ## Credentials and Recovery
 

@@ -23,10 +23,10 @@ Do not run a restore host against the production Zigbee coordinator or network u
 
 ## Restore Procedure
 
-1. Clone this repository at the intended revision and create a working copy of the ignored deployment directories from the approved encrypted backup source.
-2. Restore Home Assistant runtime data, Zigbee2MQTT data, and Mosquitto password material with their original ownership and permissions. Use [ha/secrets.yaml.example](../ha/secrets.yaml.example) only as a list of secret-key names; obtain values from the approved secret store.
-3. Confirm the Mosquitto password file exists at the host path mounted as `/etc/mosquitto/passwd`. Keep anonymous access disabled.
-4. Confirm the Home Assistant, Zigbee2MQTT, and Mosquitto mount paths in [docker-compose.yaml](../docker-compose.yaml) exist. Adjust only verified replacement-hardware paths; do not add credentials to Compose.
+1. Clone this repository at the intended revision to `/opt/homeassistant`. This single checkout is both the tracked configuration and the Compose working directory.
+2. Restore Home Assistant runtime data, Zigbee2MQTT data, and Mosquitto password material into that checkout with their original ownership and permissions. Use [ha/secrets.yaml.example](../ha/secrets.yaml.example) only as a list of secret-key names; obtain values from the approved secret store.
+3. Confirm the Mosquitto password file exists in the restored directory mounted as `/etc/mosquitto/passwd`. Keep anonymous access disabled.
+4. Confirm the Home Assistant, Zigbee2MQTT, and Mosquitto mount paths in [docker-compose.yaml](../docker-compose.yaml) exist inside `/opt/homeassistant`. Adjust only verified replacement-hardware paths; do not add credentials to Compose.
 5. Run the tracked validation commands:
 
    ```bash
@@ -37,7 +37,7 @@ Do not run a restore host against the production Zigbee coordinator or network u
    docker compose config --quiet
    ```
 
-6. Start the services using the approved operational change process. Do not start or restart the production deployment merely to test this document.
+6. From `/opt/homeassistant`, start the restored stack with `docker compose pull`, `docker compose up -d`, and `docker compose ps`. Do not start or restart the production deployment merely to test this document.
 7. In Home Assistant, run **Developer Tools → YAML → Check configuration** before any production reload or restart.
 8. Restore and configure Browser Mod if camera popups are required: install the approved version, add the integration, restart through the approved process, and register each browser. The dashboard uses Browser Mod at runtime but it is intentionally not tracked.
 
@@ -52,6 +52,10 @@ Verify these outcomes in the restored environment before treating it as ready:
 - Camera popups, snapshot storage cleanup, alarm notifications, and TTS announcements work as intended.
 
 Record the restore date, configuration revision, backup revision, failures, and follow-up work in the operational record. A successful YAML or Compose validation does not prove live hardware, credentials, integrations, or entity registries were restored correctly.
+
+The retired source-to-runtime cutover scripts are not part of recovery. A clean
+host uses the single `/opt/homeassistant` checkout above; do not recreate a
+separate deployment directory or copy only the Compose file into one.
 
 ## Live-Verified Security Decisions
 
