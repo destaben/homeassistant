@@ -43,6 +43,10 @@ assist_pipeline:
 automation: !include automations.yaml
 script: !include scripts.yaml
 
+input_boolean:
+  alarm_silent_arm:
+    name: Alarm Silent Arm
+
 input_text:
   meshtastic_public_recent_activity_1:
     name: Meshtastic Public Recent Activity 1

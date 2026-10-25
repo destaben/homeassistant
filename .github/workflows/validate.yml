@@ -53,9 +53,9 @@ jobs:
   ha-config-check:
     name: Home Assistant Config Check
     runs-on: ubuntu-latest
-    # Device-registry references (device_id) only resolve in a live HA instance.
-    # This job catches syntax and integration errors but device errors are expected.
-    continue-on-error: true
+    # Device-registry references (device_id) only resolve in a live HA instance,
+    # so those automations log setup errors here without failing the check.
+    # Syntax and configuration errors still fail the job ("Failed config").
     steps:
       - uses: actions/checkout@v4
 
