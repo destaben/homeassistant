@@ -38,7 +38,7 @@ Browser Mod is installed locally as a custom integration through HACS or `ha/cus
 
 ## Validation
 
-The tracked [GitHub Actions workflow](.github/workflows/validate.yml) runs YAML linting, Docker Compose validation, and a Home Assistant configuration check. The Home Assistant check is explicitly allowed to fail because device-registry references may not resolve outside the live instance; treat it as advisory, not as a passing guarantee. Pull-request runs are path-filtered to HA YAML and `docker-compose.yaml`; pushes to `main` or `master` trigger the workflow.
+The tracked [GitHub Actions workflow](.github/workflows/validate.yml) runs YAML linting, Docker Compose validation, and a Home Assistant configuration check. The Home Assistant check is blocking: syntax and configuration errors fail the job. Device-registry references may not resolve outside the live instance, so those automations log setup errors in CI without failing it; a passing check does not prove that device-linked automations work on the live system. Pull-request runs are path-filtered to HA YAML and `docker-compose.yaml`; pushes to `main` or `master` trigger the workflow.
 
 Run the checks locally from the repository root:
 

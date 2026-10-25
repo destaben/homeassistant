@@ -436,7 +436,10 @@
     entity_id: automation.alarm
     from: 'off'
     to: 'on'
-  conditions: []
+  conditions:
+  - condition: state
+    entity_id: input_boolean.alarm_silent_arm
+    state: 'off'
   actions:
   - action: tts.speak
     target:
@@ -458,7 +461,10 @@
     entity_id: automation.alarm
     from: 'on'
     to: 'off'
-  conditions: []
+  conditions:
+  - condition: state
+    entity_id: input_boolean.alarm_silent_arm
+    state: 'off'
   actions:
   - action: tts.speak
     target:
@@ -741,10 +747,8 @@
     after: '21:30:00'
   - condition: template
     value_template: >-
-      {{ states('sensor.david_iphone_battery_state') | lower == 'charging' }}
-  - condition: template
-    value_template: >-
-      {{ states('sensor.pixel_10a_battery_state') | lower == 'charging' }}
+      {{ states('sensor.david_iphone_battery_state') | lower == 'charging'
+         and states('sensor.pixel_10a_battery_state') | lower == 'charging' }}
   - condition: state
     entity_id: person.destaben
     state: home
@@ -770,30 +774,62 @@
         data:
           media_player_entity_id: media_player.dormitorio
           message: >-
-            {% set contacts = namespace(names=[]) %}
-            {% if states('binary_sensor.door_1_contact') == 'on' %}
-              {% set contacts.names = contacts.names + ['la puerta de entrada abierta'] %}
-            {% elif states('binary_sensor.door_1_contact') != 'off' %}
-              {% set contacts.names = contacts.names + ['el estado de la puerta de entrada no disponible'] %}
-            {% endif %}
-            {% if is_state('binary_sensor.window_1_contact', 'on') %}
-              {% set contacts.names = contacts.names + ['la ventana del Salon abierta'] %}
-            {% elif states('binary_sensor.window_1_contact') != 'off' %}
-              {% set contacts.names = contacts.names + ['el estado de la ventana del Salon no disponible'] %}
-            {% endif %}
-            {% if is_state('binary_sensor.window_2_contact', 'on') %}
-              {% set contacts.names = contacts.names + ['la ventana del Dormitorio abierta'] %}
-            {% elif states('binary_sensor.window_2_contact') != 'off' %}
-              {% set contacts.names = contacts.names + ['el estado de la ventana del Dormitorio no disponible'] %}
-            {% endif %}
-            {% if is_state('binary_sensor.window_3_contact', 'on') %}
-              {% set contacts.names = contacts.names + ['la ventana de la Cocina abierta'] %}
-            {% elif states('binary_sensor.window_3_contact') != 'off' %}
-              {% set contacts.names = contacts.names + ['el estado de la ventana de la Cocina no disponible'] %}
-            {% endif %}
-            No se arma la alarma: {{ contacts.names | join(', ') }}.
+            {% set sensors = [
+              ('binary_sensor.door_1_contact', 'la puerta de entrada abierta', 'el estado de la puerta de entrada no disponible'),
+              ('binary_sensor.window_1_contact', 'la ventana del Salon abierta', 'el estado de la ventana del Salon no disponible'),
+              ('binary_sensor.window_2_contact', 'la ventana del Dormitorio abierta', 'el estado de la ventana del Dormitorio no disponible'),
+              ('binary_sensor.window_3_contact', 'la ventana de la Cocina abierta', 'el estado de la ventana de la Cocina no disponible')] %}
+            {% set names = namespace(list=[]) %}
+            {% for entity, open_text, unavailable_text in sensors %}
+              {% if is_state(entity, 'on') %}
+                {% set names.list = names.list + [open_text] %}
+              {% elif states(entity) != 'off' %}
+                {% set names.list = names.list + [unavailable_text] %}
+              {% endif %}
+            {% endfor %}
+            No se arma la alarma: {{ names.list | join(', ') }}.
     default:
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.alarm_silent_arm
     - action: automation.turn_on
       target:
         entity_id: automation.alarm
+    - delay: "00:00:05"
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.alarm_silent_arm
+  mode: single
+- id: 7a1f3c9e2d4b4a6f8e0c5b2d9a7f1e36
+  alias: night.disarm_alarm_when_phones_unplugged
+  description: Silently disarm the security automation in the morning when a phone is unplugged.
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.david_iphone_battery_state
+    - sensor.pixel_10a_battery_state
+  conditions:
+  - condition: time
+    after: '05:00:00'
+    before: '12:00:00'
+  - condition: template
+    value_template: >-
+      {{ trigger.from_state.state | lower == 'charging'
+         and trigger.to_state.state | lower != 'charging' }}
+  - condition: state
+    entity_id: automation.alarm
+    state: 'on'
+  actions:
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.alarm_silent_arm
+  - action: automation.turn_off
+    target:
+      entity_id: automation.alarm
+    data:
+      stop_actions: true
+  - delay: "00:00:05"
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.alarm_silent_arm
   mode: single
