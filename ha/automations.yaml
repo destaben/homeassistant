@@ -345,29 +345,6 @@
     data:
       stop_actions: true
   mode: single
-- id: 5e0c2a7d9b1f4c3e8a6d2f1b7c9e4a10
-  alias: presence.alarm_arm
-  description: Arm the security automation silently when Carol or David leaves home.
-  triggers:
-  - entity_id:
-    - person.destaben
-    - person.carolmontaes
-    from: home
-    to: not_home
-    trigger: state
-  conditions: []
-  actions:
-  - action: input_boolean.turn_on
-    target:
-      entity_id: input_boolean.alarm_silent_arm
-  - action: automation.turn_on
-    target:
-      entity_id: automation.alarm
-  - delay: "00:00:05"
-  - action: input_boolean.turn_off
-    target:
-      entity_id: input_boolean.alarm_silent_arm
-  mode: single
 - id: c96a836d1b6943e8a9b70121873d40a1
   alias: night_mode
   triggers:
@@ -484,7 +461,10 @@
     entity_id: automation.alarm
     from: 'on'
     to: 'off'
-  conditions: []
+  conditions:
+  - condition: state
+    entity_id: input_boolean.alarm_silent_arm
+    state: 'off'
   actions:
   - action: tts.speak
     target:
@@ -809,7 +789,47 @@
             {% endfor %}
             No se arma la alarma: {{ names.list | join(', ') }}.
     default:
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.alarm_silent_arm
     - action: automation.turn_on
       target:
         entity_id: automation.alarm
+    - delay: "00:00:05"
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.alarm_silent_arm
+  mode: single
+- id: 7a1f3c9e2d4b4a6f8e0c5b2d9a7f1e36
+  alias: night.disarm_alarm_when_phones_unplugged
+  description: Silently disarm the security automation in the morning when a phone is unplugged.
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.david_iphone_battery_state
+    - sensor.pixel_10a_battery_state
+  conditions:
+  - condition: time
+    after: '05:00:00'
+    before: '12:00:00'
+  - condition: template
+    value_template: >-
+      {{ trigger.from_state.state | lower == 'charging'
+         and trigger.to_state.state | lower != 'charging' }}
+  - condition: state
+    entity_id: automation.alarm
+    state: 'on'
+  actions:
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.alarm_silent_arm
+  - action: automation.turn_off
+    target:
+      entity_id: automation.alarm
+    data:
+      stop_actions: true
+  - delay: "00:00:05"
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.alarm_silent_arm
   mode: single
