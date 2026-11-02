@@ -59,6 +59,21 @@ input_text:
   meshtastic_public_recent_activity_5:
     name: Meshtastic Public Recent Activity 5
     max: 255
+  meshtastic_last_bots:
+    name: Meshtastic Last Bots
+    max: 255
+  meshtastic_last_iberia:
+    name: Meshtastic Last Iberia
+    max: 255
+  meshtastic_last_mediumfast:
+    name: Meshtastic Last Mediumfast
+    max: 255
+  meshtastic_last_test:
+    name: Meshtastic Last Test
+    max: 255
+  meshtastic_last_zaragoza:
+    name: Meshtastic Last Zaragoza
+    max: 255
 
 sensor:
   # Derivadas de contadores Meshtastic d3st — tasa de cambio (anomalías)
@@ -207,3 +222,36 @@ mqtt:
       value_template: "{{ value_json.state }}"
       qos: 1
       retain: true
+
+template:
+  - sensor:
+      - name: "Meshtastic Last Bots"
+        unique_id: meshtastic_last_bots
+        state: "{% set raw = states('input_text.meshtastic_last_bots') %}{{ (raw | from_json).message if raw.startswith('{') else 'unavailable' }}"
+        attributes:
+          node_id: "{% set raw = states('input_text.meshtastic_last_bots') %}{{ (raw | from_json).node_id if raw.startswith('{') else none }}"
+          timestamp: "{% set raw = states('input_text.meshtastic_last_bots') %}{{ (raw | from_json).timestamp if raw.startswith('{') else none }}"
+      - name: "Meshtastic Last Iberia"
+        unique_id: meshtastic_last_iberia
+        state: "{% set raw = states('input_text.meshtastic_last_iberia') %}{{ (raw | from_json).message if raw.startswith('{') else 'unavailable' }}"
+        attributes:
+          node_id: "{% set raw = states('input_text.meshtastic_last_iberia') %}{{ (raw | from_json).node_id if raw.startswith('{') else none }}"
+          timestamp: "{% set raw = states('input_text.meshtastic_last_iberia') %}{{ (raw | from_json).timestamp if raw.startswith('{') else none }}"
+      - name: "Meshtastic Last Mediumfast"
+        unique_id: meshtastic_last_mediumfast
+        state: "{% set raw = states('input_text.meshtastic_last_mediumfast') %}{{ (raw | from_json).message if raw.startswith('{') else 'unavailable' }}"
+        attributes:
+          node_id: "{% set raw = states('input_text.meshtastic_last_mediumfast') %}{{ (raw | from_json).node_id if raw.startswith('{') else none }}"
+          timestamp: "{% set raw = states('input_text.meshtastic_last_mediumfast') %}{{ (raw | from_json).timestamp if raw.startswith('{') else none }}"
+      - name: "Meshtastic Last Test"
+        unique_id: meshtastic_last_test
+        state: "{% set raw = states('input_text.meshtastic_last_test') %}{{ (raw | from_json).message if raw.startswith('{') else 'unavailable' }}"
+        attributes:
+          node_id: "{% set raw = states('input_text.meshtastic_last_test') %}{{ (raw | from_json).node_id if raw.startswith('{') else none }}"
+          timestamp: "{% set raw = states('input_text.meshtastic_last_test') %}{{ (raw | from_json).timestamp if raw.startswith('{') else none }}"
+      - name: "Meshtastic Last Zaragoza"
+        unique_id: meshtastic_last_zaragoza
+        state: "{% set raw = states('input_text.meshtastic_last_zaragoza') %}{{ (raw | from_json).message if raw.startswith('{') else 'unavailable' }}"
+        attributes:
+          node_id: "{% set raw = states('input_text.meshtastic_last_zaragoza') %}{{ (raw | from_json).node_id if raw.startswith('{') else none }}"
+          timestamp: "{% set raw = states('input_text.meshtastic_last_zaragoza') %}{{ (raw | from_json).timestamp if raw.startswith('{') else none }}"

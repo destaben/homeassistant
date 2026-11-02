@@ -797,3 +797,83 @@
       target:
         entity_id: automation.alarm
   mode: single
+
+- id: meshtastic_channel_last_message
+  alias: meshtastic.channel_last_message
+  description: Store the latest text message of each Meshtastic channel for the lab status route.
+  triggers:
+  - trigger: event
+    event_type: meshtastic_api_text_message
+  conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.event.data.data.message is string and trigger.event.data.data.message | length > 0 }}
+  actions:
+  - choose:
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.data.to.channel == state_attr('meshtastic.gateway_d3st_channel_bots', 'index') }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_bots
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.data.message[:140],
+                    'node_id': '!%08x' % (trigger.event.data.data.from | int),
+                    'timestamp': now().isoformat()} | tojson }}
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.data.to.channel == state_attr('meshtastic.gateway_d3st_channel_iberia', 'index') }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_iberia
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.data.message[:140],
+                    'node_id': '!%08x' % (trigger.event.data.data.from | int),
+                    'timestamp': now().isoformat()} | tojson }}
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.data.to.channel == state_attr('meshtastic.gateway_d3st_channel_mediumfast', 'index') }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_mediumfast
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.data.message[:140],
+                    'node_id': '!%08x' % (trigger.event.data.data.from | int),
+                    'timestamp': now().isoformat()} | tojson }}
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.data.to.channel == state_attr('meshtastic.gateway_d3st_channel_test', 'index') }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_test
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.data.message[:140],
+                    'node_id': '!%08x' % (trigger.event.data.data.from | int),
+                    'timestamp': now().isoformat()} | tojson }}
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.data.to.channel == state_attr('meshtastic.gateway_d3st_channel_zaragoza', 'index') }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_zaragoza
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.data.message[:140],
+                    'node_id': '!%08x' % (trigger.event.data.data.from | int),
+                    'timestamp': now().isoformat()} | tojson }}
+  mode: queued
+  max: 10
