@@ -833,3 +833,83 @@
     target:
       entity_id: input_boolean.alarm_silent_arm
   mode: single
+
+- id: meshtastic_channel_last_message
+  alias: meshtastic.channel_last_message
+  description: Store the latest text message of each Meshtastic channel for the lab status route. Direct messages are ignored.
+  triggers:
+  - trigger: event
+    event_type: meshtastic_message_log
+  conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.event.data.pki == false and trigger.event.data.message is string and trigger.event.data.message | length > 0 }}
+  actions:
+  - choose:
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.entity_id == 'meshtastic.gateway_d3st_channel_bots' }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_bots
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.message[:140],
+                    'node_id': (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}'))[0] if (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}')) else none,
+                    'timestamp': now().isoformat()} | tojson }}
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.entity_id == 'meshtastic.gateway_d3st_channel_iberia' }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_iberia
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.message[:140],
+                    'node_id': (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}'))[0] if (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}')) else none,
+                    'timestamp': now().isoformat()} | tojson }}
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.entity_id == 'meshtastic.gateway_d3st_channel_mediumfast' }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_mediumfast
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.message[:140],
+                    'node_id': (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}'))[0] if (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}')) else none,
+                    'timestamp': now().isoformat()} | tojson }}
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.entity_id == 'meshtastic.gateway_d3st_channel_test' }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_test
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.message[:140],
+                    'node_id': (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}'))[0] if (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}')) else none,
+                    'timestamp': now().isoformat()} | tojson }}
+    - conditions:
+        - condition: template
+          value_template: >-
+            {{ trigger.event.data.entity_id == 'meshtastic.gateway_d3st_channel_zaragoza' }}
+      sequence:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.meshtastic_last_zaragoza
+          data:
+            value: >-
+              {{ {'message': trigger.event.data.message[:140],
+                    'node_id': (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}'))[0] if (trigger.event.data.from_name | regex_findall('![0-9A-Fa-f]{8}')) else none,
+                    'timestamp': now().isoformat()} | tojson }}
+  mode: queued
+  max: 10
