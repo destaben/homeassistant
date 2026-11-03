@@ -916,7 +916,7 @@
 
 # --- Occupancy, smoke, printer and vacuum automations (2026-11) ---
 
-- id: claude_alarma_off_al_desenchufar_movil
+- id: disarm_alarm_when_phone_unplugged
   alias: alarm.disarm_when_phone_unplugged_morning
   description: >-
     Disarms the alarm in the morning when a phone is unplugged. Counterpart of
@@ -957,14 +957,14 @@
         media_player_entity_id:
           - media_player.dormitorio
           - media_player.despacho
-        message: "Alarma desactivada"
+        message: "Alarm disarmed"
     - action: notify.mobile_app_david_iphone
       data:
-        title: "Alarma desactivada"
-        message: "Se ha desenchufado un móvil por la mañana y la alarma se ha desactivado."
+        title: "Alarm disarmed"
+        message: "A phone was unplugged in the morning and the alarm was disarmed."
   mode: single
 
-- id: claude_humo_durante_impresion
+- id: smoke_alert_while_printing
   alias: smoke.printing_alert
   description: >-
     On smoke: printer snapshot, critical iPhone notification and, if the printer
@@ -1005,8 +1005,8 @@
                   - siren.tapo_camera_3ca0_siren
     - action: notify.mobile_app_david_iphone
       data:
-        title: "¡Humo detectado!"
-        message: "Humo detectado. Estado de la impresora: {{ states('sensor.ender_3_v3_se_current_print_state') }}."
+        title: "Smoke detected!"
+        message: "Smoke detected. Printer state: {{ states('sensor.ender_3_v3_se_current_print_state') }}."
         data:
           push:
             interruption-level: critical
@@ -1014,7 +1014,7 @@
             url: "{{ snapshot_path | replace('/config/www', '/local') }}"
   mode: single
 
-- id: claude_aspiradora_por_ocupacion
+- id: clean_after_occupancy
   alias: vacuum.clean_after_occupancy
   description: >-
     Starts the vacuum when the house has been occupied for a long time (more than
@@ -1022,14 +1022,14 @@
     6 h cooldown.
   triggers:
     - trigger: numeric_state
-      entity_id: sensor.tiempo_ocupado_3h
+      entity_id: sensor.occupied_time_3h
       above: 1
     - trigger: numeric_state
-      entity_id: sensor.visitas_ocupacion_3h
+      entity_id: sensor.occupancy_visits_3h
       above: 8
   conditions:
     - condition: state
-      entity_id: binary_sensor.ocupacion_hogar
+      entity_id: binary_sensor.home_occupancy
       state: "off"
     - condition: time
       after: "09:00:00"
@@ -1050,7 +1050,7 @@
         entity_id: vacuum.xiaomi_robot_vacuum_x20
   mode: single
 
-- id: claude_foto_impresion_terminada
+- id: print_complete_snapshot
   alias: ender.print_complete_snapshot
   description: Printer snapshot and notification when a print finishes.
   triggers:
@@ -1069,13 +1069,13 @@
     - action: notify.mobile_app_david_iphone
       data:
         title: "Ender 3 V3 SE"
-        message: "Impresión terminada."
+        message: "Print finished."
         data:
           attachment:
             url: "{{ snapshot_path | replace('/config/www', '/local') }}"
   mode: single
 
-- id: claude_aspiradora_error
+- id: vacuum_error_notify
   alias: vacuum.error_notify
   description: Notifies when the Xiaomi X20+ vacuum reports an error.
   triggers:
@@ -1087,6 +1087,6 @@
   actions:
     - action: notify.mobile_app_david_iphone
       data:
-        title: "Aspiradora: error"
-        message: "Error de la aspiradora: {{ trigger.to_state.state }}."
+        title: "Vacuum: error"
+        message: "Vacuum error: {{ trigger.to_state.state }}."
   mode: single
