@@ -80,6 +80,26 @@ input_text:
     max: 255
 
 sensor:
+  # Home occupancy: accumulated time and visit count over the last 3 h
+  # (source entity is binary_sensor.ocupacion_hogar, defined under template:)
+  - platform: history_stats
+    name: "Tiempo ocupado 3h"
+    unique_id: tiempo_ocupado_3h
+    entity_id: binary_sensor.ocupacion_hogar
+    state: "on"
+    type: time
+    start: "{{ now() - timedelta(hours=3) }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    name: "Visitas ocupacion 3h"
+    unique_id: visitas_ocupacion_3h
+    entity_id: binary_sensor.ocupacion_hogar
+    state: "on"
+    type: count
+    start: "{{ now() - timedelta(hours=3) }}"
+    end: "{{ now() }}"
+
   # Derivadas de contadores Meshtastic d3st — tasa de cambio (anomalías)
   - platform: derivative
     source: sensor.meshtastic_d3st_2661074868_stats_packets_rx_bad
@@ -228,6 +248,12 @@ mqtt:
       retain: true
 
 template:
+  - binary_sensor:
+      # On when either occupancy sensor detects presence
+      - name: "Ocupacion hogar"
+        unique_id: ocupacion_hogar_combinada
+        state: "{{ is_state('binary_sensor.motion_1_occupancy', 'on') or is_state('binary_sensor.motion_2_occupancy', 'on') }}"
+
   - sensor:
       - name: "Meshtastic Last Bots"
         unique_id: meshtastic_last_bots
