@@ -4,8 +4,8 @@ This record covers re-arming the ICP (power-control switch) through the distribu
 
 ## Scope
 
-- The re-arm tooling is an unofficial client ([`trocotronic/edistribucion`](https://github.com/trocotronic/edistribucion)) wrapped by two scripts on the home server: a read-only `status.py` and a `reconnect.py`.
-- `reconnect.py` is a dry run by default. `--confirm` performs the real reconnect. It enforces a 15 minute cooldown and a cap of 3 reconnects per day.
+- The re-arm tooling is an unofficial client ([`trocotronic/edistribucion`](https://github.com/trocotronic/edistribucion)) wrapped by two scripts, run on the host chosen under the host options below (the home server under option A): a read-only `status.py` and a `reconnect.py`.
+- `reconnect.py` is a dry run by default (**unverified** here: the tooling lives outside this repository, so this describes the intended behaviour). `--confirm` performs the real reconnect. It enforces a 15 minute cooldown and a cap of 3 reconnects per day.
 - Credentials live in a mode `0600` env file filled in by the owner on the host that runs the tooling. They are never stored in this repository, in `ha/secrets.yaml`, or in Compose.
 
 ## Decisions
@@ -58,5 +58,5 @@ These steps need the real account and are pending the owner:
 - [ ] `status.py` logs in and lists the supply point and ICP status.
 - [ ] A manual `reconnect.py --confirm` re-arms a tripped ICP, and the reconnect action still matches the current distributor web.
 - [ ] The host option (A or B) and the mains-loss signal are chosen and recorded.
-- [ ] The Home Assistant automation is added with verified entities. Test it with the dry run first, then validate it as described in the [README](../README.md#validation).
+- [ ] The Home Assistant automation is added with verified entities. Test it with the dry run first. The [README](../README.md#validation) validation covers only the YAML and Compose checks; the drill below covers the automation itself.
 - [ ] A drill confirms the automation does not fire on a short flicker and respects the cooldown and daily cap.
