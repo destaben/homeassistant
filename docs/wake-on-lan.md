@@ -35,6 +35,12 @@ state can read "on" while asleep. Verify behaviour per device.
 3. Control Panel → Power Options → disable **Fast startup**.
 4. Lid close action: Sleep (or Do nothing).
 
+## Rollout state
+Only the MacBook Neo switch is active. The Air and ASUS switches are commented out in
+`ha/configuration.yaml` because their Ethernet MAC/IP are not known yet; uncomment them after
+adding their `wol_*` keys to `ha/secrets.yaml` (an undefined `!secret` makes the whole
+configuration invalid). Give each laptop a DHCP reservation in the router so the ping state stays valid.
+
 ## Validation
 After filling `ha/secrets.yaml`, run Developer Tools → YAML → Check configuration, restart Home
 Assistant, then call `switch.turn_on` on each WoL entity while that laptop is asleep.

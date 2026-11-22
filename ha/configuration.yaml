@@ -172,23 +172,26 @@ sensor:
 # State is derived from a ping to `host`; the switch only sends the magic packet.
 switch:
   - platform: wake_on_lan
-    name: "MacBook Air WoL"
-    unique_id: wol_macbook_air
-    mac: !secret wol_macbook_air_mac
-    host: !secret wol_macbook_air_host
-    broadcast_address: !secret wol_broadcast_address
-  - platform: wake_on_lan
     name: "MacBook Neo WoL"
     unique_id: wol_macbook_neo
     mac: !secret wol_macbook_neo_mac
     host: !secret wol_macbook_neo_host
     broadcast_address: !secret wol_broadcast_address
-  - platform: wake_on_lan
-    name: "ASUS FX505 WoL"
-    unique_id: wol_asus_fx505
-    mac: !secret wol_asus_fx505_mac
-    host: !secret wol_asus_fx505_host
-    broadcast_address: !secret wol_broadcast_address
+  # MacBook Air and ASUS FX505: enable once their Ethernet MAC/IP are known.
+  # Add wol_macbook_air_* / wol_asus_fx505_* to secrets.yaml first (see
+  # secrets.yaml.example), otherwise an undefined !secret fails the whole config.
+  # - platform: wake_on_lan
+  #   name: "MacBook Air WoL"
+  #   unique_id: wol_macbook_air
+  #   mac: !secret wol_macbook_air_mac
+  #   host: !secret wol_macbook_air_host
+  #   broadcast_address: !secret wol_broadcast_address
+  # - platform: wake_on_lan
+  #   name: "ASUS FX505 WoL"
+  #   unique_id: wol_asus_fx505
+  #   mac: !secret wol_asus_fx505_mac
+  #   host: !secret wol_asus_fx505_host
+  #   broadcast_address: !secret wol_broadcast_address
 
 mqtt:
   switch:
