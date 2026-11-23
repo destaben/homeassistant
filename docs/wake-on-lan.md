@@ -1,4 +1,4 @@
-# Wake-on-LAN for closed-lid laptops
+# Wake-on-LAN for closed-lid MacBooks
 
 Home Assistant sends a magic packet through `switch.*_wol` entities defined in
 [ha/configuration.yaml](../ha/configuration.yaml). The container uses host networking, so the
@@ -13,8 +13,6 @@ Real values go in the untracked `ha/secrets.yaml`; see
 - **macOS (Air, Neo):** plug in the Ethernet adapter, then run `networksetup -listallhardwareports`
   and use the `Ethernet Address` of the adapter's port. Or: System Settings → Network → the
   Ethernet adapter → Details → Hardware.
-- **Windows (ASUS FX505):** `ipconfig /all` in a terminal; use "Physical Address" of the
-  "Ethernet adapter" section (Realtek PCIe GbE).
 
 Also reserve a fixed IP for each MAC in the router (DHCP reservation); it is used for the ping state.
 
@@ -28,18 +26,13 @@ Also reserve a fixed IP for each MAC in the router (DHCP reservation); it is use
 Limitation: a sleeping Mac may still answer ping through the network sleep proxy, so the ping-based
 state can read "on" while asleep. Verify behaviour per device.
 
-### ASUS FX505 (Windows)
-1. BIOS (F2): enable "Power On By PCI-E" / Wake on LAN if present.
-2. Device Manager → Realtek adapter → Advanced: "Wake on Magic Packet" = Enabled; Power
-   Management: allow the device to wake the computer, magic packet only.
-3. Control Panel → Power Options → disable **Fast startup**.
-4. Lid close action: Sleep (or Do nothing).
-
 ## Rollout state
-Only the MacBook Neo switch is active. The Air and ASUS switches are commented out in
-`ha/configuration.yaml` because their Ethernet MAC/IP are not known yet; uncomment them after
-adding their `wol_*` keys to `ha/secrets.yaml` (an undefined `!secret` makes the whole
-configuration invalid). Give each laptop a DHCP reservation in the router so the ping state stays valid.
+Only the `MacBook Neo WoL` switch is active. The Neo and the Air currently share one USB-LAN
+adapter, so the switch targets the adapter's MAC and its reserved IP (`.60`) and wakes whichever Mac has
+the adapter plugged in. The Air switch stays commented out in `ha/configuration.yaml`: uncomment it
+after the Air gets its own adapter and its `wol_macbook_air_*` keys are in `ha/secrets.yaml` (an
+undefined `!secret` makes the whole configuration invalid). Give each adapter a DHCP reservation in the
+router so the ping state stays valid.
 
 ## Validation
 After filling `ha/secrets.yaml`, run Developer Tools → YAML → Check configuration, restart Home

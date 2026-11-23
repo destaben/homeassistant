@@ -94,7 +94,7 @@ be restored.
 - Use Home Assistant `!secret` references and placeholder-only examples.
 - The broker configuration disables anonymous access. Create its password file before starting the broker and configure clients with matching credentials; never put the passwords in this README or Compose file.
 - Follow the [disaster-recovery runbook](docs/disaster-recovery.md) to back up and restore the untracked deployment data. This repository alone is not a complete recovery source.
-- See [Wake-on-LAN for closed-lid laptops](docs/wake-on-lan.md) for the MAC lookup and per-device setup.
+- See [Wake-on-LAN for closed-lid MacBooks](docs/wake-on-lan.md) for the MAC lookup and per-device setup.
 - See the [ICP re-arm design](docs/icp-rearm.md) for the planned automatic re-arm after a power trip. It is a design record; nothing is implemented in tracked configuration yet.
 
 For current incidents, priorities, and feature requests, consult the [GitHub Issues](https://github.com/destaben/homeassistant/issues) page directly.

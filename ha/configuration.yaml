@@ -168,7 +168,7 @@ sensor:
       hours: 1
     sampling_size: 1000
 
-# Wake-on-LAN for the closed-lid laptops (Ethernet only, see docs/wake-on-lan.md).
+# Wake-on-LAN for the closed-lid MacBooks (Ethernet only, see docs/wake-on-lan.md).
 # State is derived from a ping to `host`; the switch only sends the magic packet.
 switch:
   - platform: wake_on_lan
@@ -177,20 +177,15 @@ switch:
     mac: !secret wol_macbook_neo_mac
     host: !secret wol_macbook_neo_host
     broadcast_address: !secret wol_broadcast_address
-  # MacBook Air and ASUS FX505: enable once their Ethernet MAC/IP are known.
-  # Add wol_macbook_air_* / wol_asus_fx505_* to secrets.yaml first (see
-  # secrets.yaml.example), otherwise an undefined !secret fails the whole config.
+  # MacBook Air: the Air and the Neo currently share one USB-LAN adapter (same MAC, same
+  # reserved IP), so "MacBook Neo WoL" above wakes whichever Mac has the adapter plugged in.
+  # Enable this switch only once the Air has its own adapter/MAC. Add wol_macbook_air_* to
+  # secrets.yaml first (see secrets.yaml.example), otherwise an undefined !secret fails the config.
   # - platform: wake_on_lan
   #   name: "MacBook Air WoL"
   #   unique_id: wol_macbook_air
   #   mac: !secret wol_macbook_air_mac
   #   host: !secret wol_macbook_air_host
-  #   broadcast_address: !secret wol_broadcast_address
-  # - platform: wake_on_lan
-  #   name: "ASUS FX505 WoL"
-  #   unique_id: wol_asus_fx505
-  #   mac: !secret wol_asus_fx505_mac
-  #   host: !secret wol_asus_fx505_host
   #   broadcast_address: !secret wol_broadcast_address
 
 mqtt:
