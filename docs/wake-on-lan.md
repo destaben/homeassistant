@@ -32,7 +32,8 @@ adapter, so the switch targets the adapter's MAC and its reserved IP (`.60`) and
 the adapter plugged in. The Air switch stays commented out in `ha/configuration.yaml`: uncomment it
 after the Air gets its own adapter and its `wol_macbook_air_*` keys are in `ha/secrets.yaml` (an
 undefined `!secret` makes the whole configuration invalid). Give each adapter a DHCP reservation in the
-router so the ping state stays valid.
+router so the ping state stays valid. A new reservation takes effect only after the Mac renews its DHCP
+lease or the cable is replugged; until then the ping state points at the wrong IP and reads off/unavailable.
 
 ## Validation
 After filling `ha/secrets.yaml`, run Developer Tools → YAML → Check configuration, restart Home

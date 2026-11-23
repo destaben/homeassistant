@@ -173,7 +173,6 @@ sensor:
 switch:
   - platform: wake_on_lan
     name: "MacBook Neo WoL"
-    unique_id: wol_macbook_neo
     mac: !secret wol_macbook_neo_mac
     host: !secret wol_macbook_neo_host
     broadcast_address: !secret wol_broadcast_address
@@ -183,7 +182,6 @@ switch:
   # secrets.yaml first (see secrets.yaml.example), otherwise an undefined !secret fails the config.
   # - platform: wake_on_lan
   #   name: "MacBook Air WoL"
-  #   unique_id: wol_macbook_air
   #   mac: !secret wol_macbook_air_mac
   #   host: !secret wol_macbook_air_host
   #   broadcast_address: !secret wol_broadcast_address
