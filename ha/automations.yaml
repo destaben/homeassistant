@@ -679,7 +679,7 @@
   - variables:
       snapshot_ts: '{{ now().strftime(''%Y%m%d_%H%M%S'') }}'
   - target:
-      entity_id: camera.tapo_camera_2f13
+      entity_id: camera.tapo_camera_2f13_hd_stream
     data:
       filename: /config/www/snapshots/alarm_{{ snapshot_ts }}.jpg
     action: camera.snapshot
@@ -715,7 +715,7 @@
             volume: 1.0
         notification_icon: mdi:alarm-light
         color: red
-    action: notify.pixel_10a
+    action: notify.mobile_app_pixel_10a
   mode: single
 - id: meshtastic_public_broadcast_event
   alias: meshtastic.public_broadcast_event
